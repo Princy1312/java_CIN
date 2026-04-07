@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='dashboard',pageTitle='Tableau de bord')}">
+<div th:fragment="content">
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="stat-card" style="background:linear-gradient(135deg,#1a3c5e,#2d6a9f)"><div class="d-flex justify-content-between align-items-center"><div><div style="font-size:13px;opacity:.8">Total Citoyens</div><div style="font-size:36px;font-weight:800" th:text="${totalCitoyens}">0</div></div><div style="font-size:45px;opacity:.3">👥</div></div></div></div>
+    <div class="col-md-3"><div class="stat-card" style="background:linear-gradient(135deg,#059669,#10b981)"><div class="d-flex justify-content-between align-items-center"><div><div style="font-size:13px;opacity:.8">Cartes Délivrées</div><div style="font-size:36px;font-weight:800" th:text="${imprimees}">0</div></div><div style="font-size:45px;opacity:.3">🪪</div></div></div></div>
+    <div class="col-md-3"><div class="stat-card" style="background:linear-gradient(135deg,#d97706,#f59e0b)"><div class="d-flex justify-content-between align-items-center"><div><div style="font-size:13px;opacity:.8">En Attente</div><div style="font-size:36px;font-weight:800" th:text="${enAttente}">0</div></div><div style="font-size:45px;opacity:.3">⏳</div></div></div></div>
+    <div class="col-md-3"><div class="stat-card" style="background:linear-gradient(135deg,#dc2626,#ef4444)"><div class="d-flex justify-content-between align-items-center"><div><div style="font-size:13px;opacity:.8">Dossiers en Retard</div><div style="font-size:36px;font-weight:800" th:text="${dossiersRetard}">0</div></div><div style="font-size:45px;opacity:.3">⚠️</div></div></div></div>
+</div>
+
+<div sec:authorize="hasAnyRole('ADMINISTRATEUR','SUPERVISEUR')" class="row g-4 mb-4">
+    <div class="col-md-3"><div class="stat-card" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6)"><div class="d-flex justify-content-between align-items-center"><div><div style="font-size:13px;opacity:.8">Utilisateurs</div><div style="font-size:36px;font-weight:800" th:text="${totalUtilisateurs}">0</div></div><div style="font-size:45px;opacity:.3">👤</div></div></div></div>
+    <div class="col-md-3"><div class="stat-card" style="background:linear-gradient(135deg,#0891b2,#06b6d4)"><div class="d-flex justify-content-between align-items-center"><div><div style="font-size:13px;opacity:.8">Validées</div><div style="font-size:36px;font-weight:800" th:text="${validees}">0</div></div><div style="font-size:45px;opacity:.3">✅</div></div></div></div>
+    <div class="col-md-3"><div class="stat-card" style="background:linear-gradient(135deg,#3b82f6,#60a5fa)"><div class="d-flex justify-content-between align-items-center"><div><div style="font-size:13px;opacity:.8">En Cours</div><div style="font-size:36px;font-weight:800" th:text="${enCours}">0</div></div><div style="font-size:45px;opacity:.3">🔄</div></div></div></div>
+    <div class="col-md-3"><div class="stat-card" style="background:linear-gradient(135deg,#be185d,#ec4899)"><div class="d-flex justify-content-between align-items-center"><div><div style="font-size:13px;opacity:.8">Rejetées</div><div style="font-size:36px;font-weight:800" th:text="${rejetees}">0</div></div><div style="font-size:45px;opacity:.3">❌</div></div></div></div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-8"><div class="card"><div class="card-header"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Statistiques Mensuelles</div><div class="card-body"><canvas id="monthlyChart" height="100"></canvas></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-header"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Répartition des Statuts</div><div class="card-body"><canvas id="statusChart"></canvas></div></div></div>
+</div>
+
+<div class="row g-4 mb-4" sec:authorize="hasAnyRole('ADMINISTRATEUR','SUPERVISEUR')">
+    <div class="col-md-6"><div class="card"><div class="card-header"><i class="bi bi-list-check me-2 text-primary"></i>Détail par Statut</div><div class="card-body p-0"><table class="table mb-0">
+        <tr><td><span class="badge badge-EN_ATTENTE">En Attente</span></td><td class="fw-bold" th:text="${enAttente}"></td></tr>
+        <tr><td><span class="badge badge-EN_COURS">En Cours</span></td><td class="fw-bold" th:text="${enCours}"></td></tr>
+        <tr><td><span class="badge badge-VALIDEE">Validées</span></td><td class="fw-bold" th:text="${validees}"></td></tr>
+        <tr><td><span class="badge badge-IMPRIMEE">Imprimées</span></td><td class="fw-bold" th:text="${imprimees}"></td></tr>
+        <tr><td><span class="badge badge-REJETEE">Rejetées</span></td><td class="fw-bold" th:text="${rejetees}"></td></tr>
+    </table></div></div></div>
+    <div class="col-md-6"><div class="card"><div class="card-header"><i class="bi bi-geo-alt-fill me-2 text-primary"></i>Citoyens par Région</div><div class="card-body p-0"><table class="table mb-0">
+        <thead><tr><th>Région</th><th>Citoyens</th></tr></thead>
+        <tbody>
+        <tr th:each="s:${statsRegion}"><td th:text="${s[0]}?:'Non définie'"></td><td><span class="badge bg-primary" th:text="${s[1]}"></span></td></tr>
+        <tr th:if="${#lists.isEmpty(statsRegion)}"><td colspan="2" class="text-center text-muted">Aucune donnée</td></tr>
+        </tbody>
+    </table></div></div></div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="bi bi-lightning-fill me-2 text-warning"></i>Actions Rapides</div>
+    <div class="card-body d-flex gap-3 flex-wrap">
+        <a sec:authorize="hasAnyRole('AGENT_ENREGISTREMENT','ADMINISTRATEUR')" th:href="@{/citizens/new}" class="btn btn-primary"><i class="bi bi-person-plus me-2"></i>Enregistrer un Citoyen</a>
+        <a sec:authorize="hasAnyRole('AGENT_ENREGISTREMENT','ADMINISTRATEUR')" th:href="@{/requests/new}" class="btn btn-success"><i class="bi bi-file-earmark-plus me-2"></i>Nouvelle Demande CIN</a>
+        <a sec:authorize="hasAnyRole('AGENT_VALIDATION','ADMINISTRATEUR','SUPERVISEUR')" th:href="@{/requests(status=EN_ATTENTE)}" class="btn btn-warning text-dark"><i class="bi bi-clock-history me-2"></i>Demandes à Valider <span class="badge bg-dark ms-1" th:text="${enAttente}"></span></a>
+        <a sec:authorize="hasAnyRole('SUPERVISEUR','ADMINISTRATEUR')" th:href="@{/requests(status=VALIDEE)}" class="btn btn-info text-white"><i class="bi bi-printer me-2"></i>Demandes à Imprimer <span class="badge bg-dark ms-1" th:text="${validees}"></span></a>
+        <a sec:authorize="hasRole('ADMINISTRATEUR')" th:href="@{/admin/users}" class="btn btn-secondary"><i class="bi bi-people me-2"></i>Gérer les Utilisateurs</a>
+    </div>
+</div>
+
+</div>
+<div th:fragment="scripts">
+<script th:inline="javascript">
+const md=/*[[${statsMensuelles}]]*/[];
+const mc=new Array(12).fill(0);
+if(md)md.forEach(r=>{if(r&&r[0])mc[r[0]-1]=r[1]||0});
+new Chart(document.getElementById('monthlyChart'),{type:'bar',data:{labels:['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'],datasets:[{label:'Demandes',data:mc,backgroundColor:'rgba(45,106,159,0.7)',borderColor:'#1a3c5e',borderWidth:2,borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('statusChart'),{type:'doughnut',data:{labels:['En Attente','En Cours','Validées','Imprimées','Rejetées'],datasets:[{data:[/*[[${enAttente}]]*/0,/*[[${enCours}]]*/0,/*[[${validees}]]*/0,/*[[${imprimees}]]*/0,/*[[${rejetees}]]*/0],backgroundColor:['#f59e0b','#3b82f6','#10b981','#8b5cf6','#ef4444']}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom'}}}});
+</script>
+</div>
+</div>
+</body>
+</html>

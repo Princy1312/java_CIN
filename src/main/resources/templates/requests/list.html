@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='requests',pageTitle='Demandes CIN')}">
+<div th:fragment="content">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <p class="text-muted mb-0">Gestion des demandes de Cartes d'Identité Nationale</p>
+    <a sec:authorize="hasAnyRole('AGENT_ENREGISTREMENT','ADMINISTRATEUR')"
+       th:href="@{/requests/new}" class="btn btn-primary">
+        <i class="bi bi-file-earmark-plus me-2"></i>Nouvelle Demande
+    </a>
+</div>
+
+<div class="card mb-4"><div class="card-body d-flex gap-2 flex-wrap">
+    <a th:href="@{/requests}" class="btn btn-sm" th:classappend="${filterStatus==null}?' btn-dark':' btn-outline-dark'">Toutes</a>
+    <a th:each="s:${statuses}" th:href="@{/requests(status=${s})}" class="btn btn-sm btn-outline-secondary"
+       th:classappend="${filterStatus==s.name()}?' active':''" th:text="${s.name().replace('_',' ')}"></a>
+</div></div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <span><i class="bi bi-file-earmark-text me-2 text-primary"></i>Liste des Demandes</span>
+        <span class="badge bg-primary" th:text="${#lists.size(requests)}+' demande(s)'"></span>
+    </div>
+    <div class="card-body p-0"><div class="table-responsive"><table class="table table-hover mb-0">
+        <thead><tr><th>N° Dossier</th><th>Citoyen</th><th>Type</th><th>Statut</th><th>Agent</th><th>Date Dépôt</th><th>Traitement</th><th>Actions</th></tr></thead>
+        <tbody>
+        <tr th:each="r:${requests}">
+            <td><code th:text="${r.numeroDossier}"></code></td>
+            <td><div class="fw-semibold" th:text="${r.citizen.nom}+' '+${r.citizen.prenom}"></div><small class="text-muted" th:text="${r.citizen.numeroNational}"></small></td>
+            <td><span class="badge bg-secondary" th:text="${r.type.name().replace('_',' ')}"></span></td>
+            <td><span class="badge" th:classappend="'badge-'+${r.statut.name()}" th:text="${r.statut.name().replace('_',' ')}"></span></td>
+            <td th:text="${r.agentResponsable!=null}?${r.agentResponsable.prenom}+' '+${r.agentResponsable.nom}:'-'"></td>
+            <td th:text="${#temporals.format(r.dateDepot,'dd/MM/yyyy')}"></td>
+            <td th:text="${r.dateTraitement!=null}?${#temporals.format(r.dateTraitement,'dd/MM/yyyy')}:'-'"></td>
+            <td><div class="d-flex gap-1 align-items-center">
+                <a th:href="@{/requests/{id}(id=${r.id})}" class="btn btn-sm btn-outline-primary" title="Voir"><i class="bi bi-eye"></i></a>
+                <span sec:authorize="hasAnyRole('AGENT_VALIDATION','ADMINISTRATEUR','SUPERVISEUR')"
+                      th:if="${r.statut.name()=='EN_ATTENTE'}" class="badge bg-warning text-dark">À traiter</span>
+                <span sec:authorize="hasAnyRole('SUPERVISEUR','ADMINISTRATEUR')"
+                      th:if="${r.statut.name()=='VALIDEE'}" class="badge bg-info text-white">À imprimer</span>
+            </div></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(requests)}">
+            <td colspan="8" class="text-center text-muted py-5">
+                <div style="font-size:50px">📋</div><p>Aucune demande</p>
+                <a sec:authorize="hasAnyRole('AGENT_ENREGISTREMENT','ADMINISTRATEUR')" th:href="@{/requests/new}" class="btn btn-primary btn-sm">Créer</a>
+            </td>
+        </tr>
+        </tbody>
+    </table></div></div>
+</div>
+</div>
+<div th:fragment="scripts"></div>
+</div></body></html>

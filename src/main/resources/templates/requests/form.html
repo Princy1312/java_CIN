@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='requests',pageTitle='Nouvelle Demande CIN')}">
+<div th:fragment="content">
+<div class="row justify-content-center"><div class="col-lg-7">
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a th:href="@{/requests}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Retour</a>
+    <h5 class="mb-0">Créer une Demande CIN</h5>
+</div>
+
+<!-- Message si pas autorisé -->
+<div sec:authorize="hasAnyRole('AGENT_VALIDATION','SUPERVISEUR')" class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    Seuls les <strong>Agents d'Enregistrement</strong> et les <strong>Administrateurs</strong> peuvent créer des demandes.
+</div>
+
+<!-- Formulaire : Agent Enregistrement + Admin seulement -->
+<div sec:authorize="hasAnyRole('AGENT_ENREGISTREMENT','ADMINISTRATEUR')">
+<div class="card"><div class="card-header"><i class="bi bi-file-earmark-plus me-2 text-primary"></i>Formulaire</div>
+<div class="card-body">
+<form th:action="@{/requests/new}" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <div class="mb-4">
+        <label class="form-label fw-semibold">Citoyen <span class="text-danger">*</span></label>
+        <select name="citizenId" class="form-select" required>
+            <option value="">-- Sélectionner un citoyen --</option>
+            <option th:each="c:${citizens}" th:value="${c.id}" th:text="${c.nom}+' '+${c.prenom}+' ('+${c.numeroNational}+')'"></option>
+        </select>
+    </div>
+    <div class="mb-4">
+        <label class="form-label fw-semibold">Type de Demande <span class="text-danger">*</span></label>
+        <div class="row g-3">
+            <div class="col-md-4" th:each="t:${types}"><label class="d-block">
+                <input type="radio" name="type" th:value="${t}" class="d-none type-radio" required>
+                <div class="type-card border rounded-3 p-3 text-center" style="cursor:pointer;transition:all .2s">
+                    <div style="font-size:30px">
+                        <span th:if="${t.name()=='NOUVELLE_CARTE'}">🆕</span>
+                        <span th:if="${t.name()=='RENOUVELLEMENT'}">🔄</span>
+                        <span th:if="${t.name()=='DUPLICATA'}">📋</span>
+                    </div>
+                    <div class="fw-semibold mt-2" style="font-size:13px" th:text="${t.name().replace('_',' ')}"></div>
+                </div>
+            </label></div>
+        </div>
+    </div>
+    <div class="d-flex gap-3">
+        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-circle me-2"></i>Créer la Demande</button>
+        <a th:href="@{/requests}" class="btn btn-outline-secondary">Annuler</a>
+    </div>
+</form>
+</div></div>
+</div>
+</div></div>
+</div>
+<div th:fragment="scripts">
+<script>document.querySelectorAll('.type-radio').forEach(r=>r.addEventListener('change',function(){document.querySelectorAll('.type-card').forEach(c=>{c.style.background='';c.style.color='';c.style.border='1px solid #dee2e6'});if(this.checked){this.nextElementSibling.style.background='#1a3c5e';this.nextElementSibling.style.color='#fff';this.nextElementSibling.style.border='2px solid #1a3c5e'}}));</script>
+</div>
+</div></body></html>

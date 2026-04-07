@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><title>Connexion - CIN</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body{background:linear-gradient(135deg,#1a3c5e,#0d2137,#1a3c5e);min-height:100vh;display:flex;align-items:center;justify-content:center}
+        .login-card{background:#fff;border-radius:20px;padding:50px 45px;width:420px;box-shadow:0 25px 60px rgba(0,0,0,.4)}
+        .form-control{border-radius:10px;padding:12px 15px;border:2px solid #eee}
+        .form-control:focus{border-color:#2d6a9f;box-shadow:none}
+        .input-group-text{border-radius:10px 0 0 10px;background:#f8f9fa;border:2px solid #eee;border-right:none}
+        .btn-login{background:linear-gradient(135deg,#1a3c5e,#2d6a9f);border:none;border-radius:10px;padding:13px;font-weight:600;transition:all .3s}
+        .btn-login:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(26,60,94,.4)}
+        .footer-text{color:rgba(255,255,255,.4);font-size:11px;text-align:center;margin-top:30px}
+    </style>
+</head>
+<body>
+<div>
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <div style="font-size:60px">🏛️</div>
+            <h3 style="color:#1a3c5e;font-weight:800">CIN Management</h3>
+            <p class="text-muted" style="font-size:13px">Système National de Gestion des Cartes d'Identité</p>
+            <hr style="border-color:#eee">
+            <small class="text-muted" style="font-size:11px">
+                <i class="bi bi-shield-lock me-1"></i>Accès réservé au personnel autorisé
+            </small>
+        </div>
+
+        <div th:if="${param.error}" class="alert alert-danger py-2 text-center" style="font-size:14px">
+            <i class="bi bi-exclamation-triangle me-1"></i>Email ou mot de passe incorrect
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success py-2 text-center" style="font-size:14px">
+            <i class="bi bi-check-circle me-1"></i>Déconnexion réussie
+        </div>
+        <div th:if="${param.expired}" class="alert alert-warning py-2 text-center" style="font-size:14px">
+            <i class="bi bi-clock me-1"></i>Session expirée, veuillez vous reconnecter
+        </div>
+
+        <form method="post" th:action="@{/login}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-muted" style="font-size:13px">EMAIL PROFESSIONNEL</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope text-muted"></i></span>
+                    <input type="email" name="username" class="form-control" placeholder="votre@cin.gov" required autofocus>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-muted" style="font-size:13px">MOT DE PASSE</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock text-muted"></i></span>
+                    <input type="password" name="password" id="pwd" class="form-control" placeholder="••••••••" required>
+                    <button type="button" class="btn btn-outline-secondary"
+                            onclick="var p=document.getElementById('pwd');p.type=p.type=='password'?'text':'password';this.querySelector('i').className=p.type=='password'?'bi bi-eye':'bi bi-eye-slash'">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-login btn-primary w-100 text-white">
+                <i class="bi bi-shield-lock me-2"></i>Se connecter
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <small class="text-muted" style="font-size:11px">
+                <i class="bi bi-info-circle me-1"></i>
+                En cas de problème d'accès, contactez votre administrateur système
+            </small>
+        </div>
+    </div>
+    <p class="footer-text">© 2025 Ministère de l'Intérieur — Système CIN</p>
+</div>
+</body>
+</html>

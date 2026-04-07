@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='requests',pageTitle='Détail Demande')}">
+<div th:fragment="content">
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a th:href="@{/requests}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Retour</a>
+    <code th:text="${request.numeroDossier}" class="fs-6"></code>
+    <span class="badge fs-6" th:classappend="'badge-'+${request.statut.name()}" th:text="${request.statut.name().replace('_',' ')}"></span>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card mb-4"><div class="card-header"><i class="bi bi-file-earmark-text me-2 text-primary"></i>Informations</div>
+        <div class="card-body"><div class="row g-3">
+            <div class="col-md-6"><label class="text-muted" style="font-size:12px">N° DOSSIER</label><p class="fw-bold mb-0"><code th:text="${request.numeroDossier}"></code></p></div>
+            <div class="col-md-6"><label class="text-muted" style="font-size:12px">TYPE</label><p class="mb-0"><span class="badge bg-secondary" th:text="${request.type.name().replace('_',' ')}"></span></p></div>
+            <div class="col-md-6"><label class="text-muted" style="font-size:12px">DATE DÉPÔT</label><p class="fw-semibold mb-0" th:text="${#temporals.format(request.dateDepot,'dd/MM/yyyy HH:mm')}"></p></div>
+            <div class="col-md-6"><label class="text-muted" style="font-size:12px">TRAITEMENT</label><p class="fw-semibold mb-0" th:text="${request.dateTraitement!=null}?${#temporals.format(request.dateTraitement,'dd/MM/yyyy HH:mm')}:'En attente'"></p></div>
+            <div class="col-md-6"><label class="text-muted" style="font-size:12px">AGENT</label><p class="fw-semibold mb-0" th:text="${request.agentResponsable!=null}?${request.agentResponsable.prenom}+' '+${request.agentResponsable.nom}:'Non assigné'"></p></div>
+            <div class="col-12" th:if="${request.motifRejet!=null}">
+                <div class="alert alert-danger mb-0"><i class="bi bi-x-circle-fill me-2"></i><strong>Motif de rejet :</strong> <span th:text="${request.motifRejet}"></span></div>
+            </div>
+        </div></div></div>
+
+        <div class="card"><div class="card-header"><i class="bi bi-person-fill me-2 text-primary"></i>Citoyen</div>
+        <div class="card-body"><div class="d-flex align-items-center gap-3">
+            <div style="width:55px;height:65px;background:#e3eaf2;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:32px"><span th:text="${request.citizen.sexe=='M'}?'👨':'👩'"></span></div>
+            <div>
+                <h6 class="mb-1 fw-bold" th:text="${request.citizen.nom}+' '+${request.citizen.prenom}"></h6>
+                <small class="text-muted">N° : </small><code th:text="${request.citizen.numeroNational}"></code>
+            </div>
+            <a th:href="@{/citizens/{id}(id=${request.citizen.id})}" class="btn btn-sm btn-outline-primary ms-auto"><i class="bi bi-eye me-1"></i>Voir fiche</a>
+        </div></div></div>
+    </div>
+
+    <!-- PANNEAU DROIT SELON RÔLE -->
+    <div class="col-md-4">
+
+        <!-- AGENT VALIDATION : Valider ou Rejeter -->
+        <div sec:authorize="hasRole('AGENT_VALIDATION')" class="card mb-3 border-primary">
+            <div class="card-header bg-primary text-white"><i class="bi bi-shield-check me-2"></i>Validation de la Demande</div>
+            <div class="card-body">
+                <div th:if="${request.statut.name()=='EN_ATTENTE' or request.statut.name()=='EN_COURS'}">
+                    <p class="text-muted small mb-3">Approuvez ou rejetez cette demande.</p>
+                    <!-- VALIDER -->
+                    <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post" class="mb-3">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <input type="hidden" name="newStatus" value="VALIDEE"/>
+                        <button type="submit" class="btn btn-success w-100" onclick="return confirm('Confirmer la validation?')">
+                            <i class="bi bi-check-circle-fill me-2"></i>✅ VALIDER LA DEMANDE
+                        </button>
+                    </form>
+                    <!-- REJETER -->
+                    <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <input type="hidden" name="newStatus" value="REJETEE"/>
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold text-danger">Motif du rejet <span class="text-danger">*</span></label>
+                            <textarea name="motif" class="form-control border-danger" rows="3" placeholder="Raison du rejet..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Confirmer le rejet?')">
+                            <i class="bi bi-x-circle-fill me-2"></i>❌ REJETER LA DEMANDE
+                        </button>
+                    </form>
+                </div>
+                <div th:if="${request.statut.name()!='EN_ATTENTE' and request.statut.name()!='EN_COURS'}">
+                    <div class="alert alert-info mb-0"><i class="bi bi-info-circle me-2"></i>Demande déjà traitée : <strong th:text="${request.statut.name().replace('_',' ')}"></strong></div>
+                </div>
+            </div>
+        </div>
+
+		<!-- SUPERVISEUR : Imprimer -->
+		<div sec:authorize="hasRole('SUPERVISEUR')" class="card mb-3 border-info">
+		    <div class="card-header bg-info text-white"><i class="bi bi-printer me-2"></i>Impression CIN</div>
+		    <div class="card-body">
+		        <div th:if="${request.statut.name()=='VALIDEE'}">
+		            <p class="text-muted small mb-3">Demande validée. Téléchargez le PDF de la carte CIN, imprimez-la, puis marquez-la comme imprimée.</p>
+
+		            <!-- BOUTON TÉLÉCHARGER PDF -->
+		            <a th:href="@{/requests/{id}/pdf(id=${request.id})}"
+		               class="btn btn-primary w-100 mb-2" target="_blank">
+		                <i class="bi bi-file-pdf-fill me-2"></i>📄 TÉLÉCHARGER LA CARTE CIN (PDF)
+		            </a>
+
+		            <!-- BOUTON MARQUER IMPRIMÉE -->
+		            <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
+		                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+		                <input type="hidden" name="newStatus" value="IMPRIMEE"/>
+		                <button type="submit" class="btn btn-info text-white w-100"
+		                        onclick="return confirm('La carte a bien été imprimée et remise au citoyen?')">
+		                    <i class="bi bi-check2-circle me-2"></i>✅ CONFIRMER L'IMPRESSION
+		                </button>
+		            </form>
+		        </div>
+		        <div th:if="${request.statut.name()=='EN_ATTENTE'}">
+		            <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
+		                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+		                <input type="hidden" name="newStatus" value="EN_COURS"/>
+		                <button type="submit" class="btn btn-warning w-100"><i class="bi bi-arrow-repeat me-2"></i>Mettre EN COURS</button>
+		            </form>
+		        </div>
+		        <div th:if="${request.statut.name()=='IMPRIMEE'}">
+		            <div class="alert alert-success mb-2"><i class="bi bi-check-circle-fill me-2"></i>Carte imprimée et délivrée.</div>
+		            <!-- Permettre de re-télécharger le PDF même après impression -->
+		            <a th:href="@{/requests/{id}/pdf(id=${request.id})}"
+		               class="btn btn-outline-primary w-100" target="_blank">
+		                <i class="bi bi-download me-2"></i>Re-télécharger le PDF
+		            </a>
+		        </div>
+		        <div th:if="${request.statut.name()=='REJETEE'}">
+		            <div class="alert alert-danger mb-0"><i class="bi bi-x-circle-fill me-2"></i>Demande rejetée. Pas d'impression possible.</div>
+		        </div>
+		    </div>
+		</div>
+
+        <!-- ADMINISTRATEUR : contrôle total -->
+        <div sec:authorize="hasRole('ADMINISTRATEUR')" class="card mb-3 border-danger">
+            <div class="card-header bg-danger text-white"><i class="bi bi-shield-fill me-2"></i>Contrôle Administrateur</div>
+            <div class="card-body">
+                <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nouveau Statut</label>
+                        <select name="newStatus" class="form-select" required>
+                            <option th:each="s:${statuses}" th:value="${s}" th:text="${s.name().replace('_',' ')}" th:selected="${s==request.statut}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Motif (optionnel)</label>
+                        <textarea name="motif" class="form-control" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100"><i class="bi bi-arrow-repeat me-2"></i>Mettre à Jour</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- AGENT ENREGISTREMENT : info seulement -->
+        <div sec:authorize="hasRole('AGENT_ENREGISTREMENT')" class="card">
+            <div class="card-header bg-secondary text-white"><i class="bi bi-info-circle me-2"></i>Information</div>
+            <div class="card-body">
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-person-fill me-2"></i>
+                    La <strong>validation</strong> est effectuée par l'Agent de Validation.<br>
+                    L'<strong>impression</strong> est effectuée par le Superviseur.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+<div th:fragment="scripts"></div>
+</div></body></html>
