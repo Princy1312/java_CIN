@@ -1,76 +1,493 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"><title>Connexion - CIN</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        body{background:linear-gradient(135deg,#1a3c5e,#0d2137,#1a3c5e);min-height:100vh;display:flex;align-items:center;justify-content:center}
-        .login-card{background:#fff;border-radius:20px;padding:50px 45px;width:420px;box-shadow:0 25px 60px rgba(0,0,0,.4)}
-        .form-control{border-radius:10px;padding:12px 15px;border:2px solid #eee}
-        .form-control:focus{border-color:#2d6a9f;box-shadow:none}
-        .input-group-text{border-radius:10px 0 0 10px;background:#f8f9fa;border:2px solid #eee;border-right:none}
-        .btn-login{background:linear-gradient(135deg,#1a3c5e,#2d6a9f);border:none;border-radius:10px;padding:13px;font-weight:600;transition:all .3s}
-        .btn-login:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(26,60,94,.4)}
-        .footer-text{color:rgba(255,255,255,.4);font-size:11px;text-align:center;margin-top:30px}
-    </style>
+  <meta charset="UTF-8">
+  <title>Connexion — CIN Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:       #0D1B2A;
+      --navy-mid:   #1B2E42;
+      --navy-light: #243D56;
+      --accent:     #00C896;
+      --accent-dim: #00A07A;
+      --accent-bg:  rgba(0,200,150,.1);
+      --border:     rgba(255,255,255,.1);
+      --border-light: #E2E6EF;
+      --text-muted: rgba(255,255,255,.45);
+      --radius:     16px;
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-body);
+    }
+
+    body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+      background: var(--navy);
+    }
+
+    /* ── LEFT PANEL ── */
+    .lp-left {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3rem;
+      overflow: hidden;
+    }
+
+    /* Geometric background layers */
+    .lp-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 30% 110%, rgba(0,200,150,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% -10%, rgba(255,255,255,.04) 0%, transparent 60%);
+    }
+
+    /* Big decorative ring */
+    .lp-ring {
+      position: absolute;
+      right: -120px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 420px;
+      height: 420px;
+      border: 1.5px solid rgba(0,200,150,.12);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .lp-ring::before {
+      content: '';
+      position: absolute;
+      inset: 50px;
+      border: 1px solid rgba(0,200,150,.08);
+      border-radius: 50%;
+    }
+    .lp-ring::after {
+      content: '';
+      position: absolute;
+      inset: 110px;
+      border: 1px solid rgba(0,200,150,.05);
+      border-radius: 50%;
+    }
+
+    /* Small grid dots */
+    .lp-dots {
+      position: absolute;
+      bottom: 80px;
+      left: 3rem;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      opacity: .25;
+      pointer-events: none;
+    }
+    .lp-dots span {
+      width: 3px; height: 3px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: block;
+    }
+
+    .lp-brand {
+      position: relative;
+      z-index: 1;
+    }
+
+    .lp-logo {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: 3rem;
+    }
+    .lp-logo-mark {
+      width: 40px; height: 40px;
+      background: var(--accent);
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lp-logo-mark svg { width: 20px; height: 20px; stroke: var(--navy); fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .lp-logo-text {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .02em;
+    }
+    .lp-logo-sub {
+      font-size: .7rem;
+      color: var(--text-muted);
+      letter-spacing: .04em;
+    }
+
+    .lp-tagline {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+      max-width: 360px;
+    }
+    .lp-tagline em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .lp-desc {
+      font-size: .875rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 320px;
+    }
+
+    .lp-footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    .lp-security {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .5rem 1rem;
+      border: 1px solid rgba(0,200,150,.2);
+      border-radius: 8px;
+      background: rgba(0,200,150,.06);
+      color: rgba(255,255,255,.55);
+      font-size: .75rem;
+      margin-bottom: 1.5rem;
+    }
+    .lp-security svg { width: 13px; height: 13px; stroke: var(--accent); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .lp-copy {
+      font-size: .72rem;
+      color: rgba(255,255,255,.2);
+      letter-spacing: .03em;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .lp-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 2rem;
+      background: #F7F8FC;
+      position: relative;
+    }
+
+    .lp-right::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent, var(--accent) 40%, transparent);
+      opacity: .4;
+    }
+
+    .lp-form-wrap {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* Form header */
+    .lp-form-head {
+      margin-bottom: 2.25rem;
+    }
+    .lp-form-eyebrow {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: .5rem;
+    }
+    .lp-form-title {
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.2;
+      margin-bottom: .5rem;
+    }
+    .lp-form-sub {
+      font-size: .83rem;
+      color: #6B7A93;
+    }
+
+    /* Alerts */
+    .lp-alert {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .75rem 1rem;
+      border-radius: 10px;
+      font-size: .82rem;
+      margin-bottom: 1.25rem;
+      border: 1.5px solid;
+    }
+    .lp-alert svg { width: 15px; height: 15px; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .lp-alert.danger  { background: #FEF0EE; border-color: #F0B0A8; color: #A32D2D; }
+    .lp-alert.danger svg  { stroke: #A32D2D; }
+    .lp-alert.success { background: #E8FAF5; border-color: #80DFC0; color: var(--accent-dim); }
+    .lp-alert.success svg { stroke: var(--accent-dim); }
+    .lp-alert.warning { background: #FFF8E6; border-color: #F0C878; color: #8A5E00; }
+    .lp-alert.warning svg { stroke: #B87E00; }
+
+    /* Fields */
+    .lp-field { margin-bottom: 1.1rem; }
+    .lp-label {
+      display: block;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #6B7A93;
+      margin-bottom: .5rem;
+    }
+
+    .lp-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .lp-input-icon {
+      position: absolute;
+      left: .9rem;
+      pointer-events: none;
+    }
+    .lp-input-icon svg { width: 16px; height: 16px; stroke: #9BA8BC; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .lp-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 1rem 0 2.75rem;
+      border: 1.5px solid var(--border-light);
+      border-radius: 11px;
+      background: #fff;
+      font-family: var(--font-body);
+      font-size: .875rem;
+      color: var(--navy);
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+    }
+    .lp-input::placeholder { color: #BCC5D6; }
+    .lp-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3.5px rgba(0,200,150,.12);
+    }
+
+    .lp-pwd-toggle {
+      position: absolute;
+      right: .75rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: .25rem;
+      color: #9BA8BC;
+      display: flex; align-items: center;
+      transition: color .15s;
+    }
+    .lp-pwd-toggle:hover { color: var(--navy); }
+    .lp-pwd-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Submit */
+    .lp-submit {
+      width: 100%;
+      height: 48px;
+      background: var(--navy);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: .9rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 11px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: .6rem;
+      margin-top: 1.75rem;
+      transition: background .18s, transform .1s;
+      letter-spacing: .01em;
+    }
+    .lp-submit:hover { background: var(--navy-mid); }
+    .lp-submit:active { transform: scale(.98); }
+    .lp-submit svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Divider accent */
+    .lp-submit-accent {
+      background: var(--accent);
+      color: var(--navy);
+    }
+    .lp-submit-accent:hover { background: var(--accent-dim); }
+    .lp-submit-accent svg { stroke: var(--navy); }
+
+    /* Footer note */
+    .lp-note {
+      display: flex;
+      align-items: flex-start;
+      gap: .5rem;
+      margin-top: 1.5rem;
+      padding: .75rem 1rem;
+      background: #EEF0F8;
+      border-radius: 10px;
+      font-size: .77rem;
+      color: #6B7A93;
+      line-height: 1.5;
+    }
+    .lp-note svg { width: 14px; height: 14px; stroke: #9BA8BC; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      body { grid-template-columns: 1fr; }
+      .lp-left {
+        padding: 2rem 1.5rem;
+        min-height: auto;
+      }
+      .lp-ring { display: none; }
+      .lp-dots { display: none; }
+      .lp-tagline { font-size: 1.6rem; }
+      .lp-right { padding: 2rem 1.25rem 3rem; }
+      .lp-right::before { display: none; }
+    }
+  </style>
 </head>
 <body>
-<div>
-    <div class="login-card">
-        <div class="text-center mb-4">
-            <div style="font-size:60px">🏛️</div>
-            <h3 style="color:#1a3c5e;font-weight:800">CIN Management</h3>
-            <p class="text-muted" style="font-size:13px">Système National de Gestion des Cartes d'Identité</p>
-            <hr style="border-color:#eee">
-            <small class="text-muted" style="font-size:11px">
-                <i class="bi bi-shield-lock me-1"></i>Accès réservé au personnel autorisé
-            </small>
-        </div>
 
-        <div th:if="${param.error}" class="alert alert-danger py-2 text-center" style="font-size:14px">
-            <i class="bi bi-exclamation-triangle me-1"></i>Email ou mot de passe incorrect
-        </div>
-        <div th:if="${param.logout}" class="alert alert-success py-2 text-center" style="font-size:14px">
-            <i class="bi bi-check-circle me-1"></i>Déconnexion réussie
-        </div>
-        <div th:if="${param.expired}" class="alert alert-warning py-2 text-center" style="font-size:14px">
-            <i class="bi bi-clock me-1"></i>Session expirée, veuillez vous reconnecter
-        </div>
+  <!-- ── LEFT ── -->
+  <div class="lp-left">
+    <div class="lp-ring"></div>
 
-        <form method="post" th:action="@{/login}">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <div class="mb-3">
-                <label class="form-label fw-semibold text-muted" style="font-size:13px">EMAIL PROFESSIONNEL</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-envelope text-muted"></i></span>
-                    <input type="email" name="username" class="form-control" placeholder="votre@cin.gov" required autofocus>
-                </div>
-            </div>
-            <div class="mb-4">
-                <label class="form-label fw-semibold text-muted" style="font-size:13px">MOT DE PASSE</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-lock text-muted"></i></span>
-                    <input type="password" name="password" id="pwd" class="form-control" placeholder="••••••••" required>
-                    <button type="button" class="btn btn-outline-secondary"
-                            onclick="var p=document.getElementById('pwd');p.type=p.type=='password'?'text':'password';this.querySelector('i').className=p.type=='password'?'bi bi-eye':'bi bi-eye-slash'">
-                        <i class="bi bi-eye"></i>
-                    </button>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-login btn-primary w-100 text-white">
-                <i class="bi bi-shield-lock me-2"></i>Se connecter
-            </button>
-        </form>
-
-        <div class="text-center mt-4">
-            <small class="text-muted" style="font-size:11px">
-                <i class="bi bi-info-circle me-1"></i>
-                En cas de problème d'accès, contactez votre administrateur système
-            </small>
-        </div>
+    <!-- Dot grid -->
+    <div class="lp-dots">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
     </div>
-    <p class="footer-text">© 2025 Ministère de l'Intérieur — Système CIN</p>
-</div>
+
+    <div class="lp-brand">
+      <div class="lp-logo">
+        <div class="lp-logo-mark">
+          <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/><line x1="6" y1="18" x2="8" y2="18"/></svg>
+        </div>
+        <div>
+          <div class="lp-logo-text">CIN Management</div>
+          <div class="lp-logo-sub">Ministère de l'Intérieur</div>
+        </div>
+      </div>
+
+      <h1 class="lp-tagline">
+        Système National<br>
+        de Gestion des<br>
+        <em>Cartes d'Identité</em>
+      </h1>
+      <p class="lp-desc">
+        Plateforme sécurisée dédiée au personnel autorisé pour la gestion, l'émission et le suivi des cartes nationales d'identité.
+      </p>
+    </div>
+
+    <div class="lp-footer">
+      <div class="lp-security">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Accès réservé au personnel autorisé
+      </div>
+      <div class="lp-copy">© 2025 Ministère de l'Intérieur — Système CIN v2.0</div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT ── -->
+  <div class="lp-right">
+    <div class="lp-form-wrap">
+
+      <div class="lp-form-head">
+        <div class="lp-form-eyebrow">Authentification sécurisée</div>
+        <h2 class="lp-form-title">Bon retour,<br>Agent.</h2>
+        <p class="lp-form-sub">Connectez-vous avec vos identifiants professionnels.</p>
+      </div>
+
+      <!-- Alerts Thymeleaf -->
+      <div th:if="${param.error}" class="lp-alert danger">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Email ou mot de passe incorrect. Veuillez réessayer.
+      </div>
+      <div th:if="${param.logout}" class="lp-alert success">
+        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Déconnexion réussie. À bientôt !
+      </div>
+      <div th:if="${param.expired}" class="lp-alert warning">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Session expirée. Veuillez vous reconnecter.
+      </div>
+
+      <form method="post" th:action="@{/login}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <!-- Email -->
+        <div class="lp-field">
+          <label class="lp-label" for="username">Email professionnel</label>
+          <div class="lp-input-wrap">
+            <span class="lp-input-icon">
+              <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <input type="email" id="username" name="username"
+              class="lp-input" placeholder="votre@cin.gov.mg"
+              required autofocus>
+          </div>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="lp-field">
+          <label class="lp-label" for="pwd">Mot de passe</label>
+          <div class="lp-input-wrap">
+            <span class="lp-input-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input type="password" id="pwd" name="password"
+              class="lp-input" placeholder="••••••••" required>
+            <button type="button" class="lp-pwd-toggle" id="togglePwd" aria-label="Afficher/masquer le mot de passe">
+              <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="lp-submit lp-submit-accent">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Se connecter
+        </button>
+      </form>
+
+      <div class="lp-note">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        En cas de problème d'accès, veuillez contacter votre administrateur système ou le support technique du Ministère.
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById('togglePwd');
+    const inp = document.getElementById('pwd');
+    const ico = document.getElementById('eyeIcon');
+    btn.addEventListener('click', () => {
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      ico.innerHTML = show
+        ? '<line x1="1" y1="1" x2="23" y2="23"/><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 11 7 11 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 1 12s4 7 11 7a9.74 9.74 0 0 0 5.39-1.61"/>'
+        : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    });
+  </script>
+
 </body>
 </html>

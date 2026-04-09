@@ -1,50 +1,624 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: head}"></head>
+<head th:replace="~{layout :: head}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:       #0D1B2A;
+      --navy-mid:   #1B2E42;
+      --accent:     #00C896;
+      --accent-dim: #00A07A;
+      --accent-bg:  #E8FAF5;
+      --surface:    #F7F8FC;
+      --border:     #E2E6EF;
+      --text-main:  #0D1B2A;
+      --text-muted: #6B7A93;
+      --radius:     16px;
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: var(--surface); color: var(--text-main); }
+
+    /* ── PAGE ── */
+    .cf-page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── TOPBAR ── */
+    .cf-topbar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2.25rem;
+      flex-wrap: wrap;
+    }
+
+    .cf-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: .45rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      transition: all .18s;
+      white-space: nowrap;
+    }
+    .cf-back:hover { background: #fff; color: var(--text-main); border-color: #c8cfde; }
+    .cf-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .cf-page-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .cf-page-sub {
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-top: .15rem;
+    }
+
+    /* ── PROGRESS STEPS ── */
+    .cf-progress {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      padding-bottom: .25rem;
+    }
+    .cf-prog-item {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      flex-shrink: 0;
+    }
+    .cf-prog-num {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: .72rem;
+      font-weight: 700;
+      background: var(--navy);
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .cf-prog-label {
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .cf-prog-sep {
+      width: 32px;
+      height: 1.5px;
+      background: var(--border);
+      margin: 0 .5rem;
+      flex-shrink: 0;
+    }
+
+    /* ── SECTION CARD ── */
+    .cf-section {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 16px rgba(13,27,42,.05);
+    }
+
+    .cf-section-head {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1.5px solid var(--border);
+      background: var(--navy);
+    }
+    .cf-section-icon {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      background: rgba(0,200,150,.15);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .cf-section-icon svg { width: 15px; height: 15px; stroke: var(--accent); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .cf-section-title {
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .cf-section-sub {
+      font-size: .72rem;
+      color: rgba(255,255,255,.4);
+      margin-left: auto;
+    }
+
+    .cf-section-body {
+      padding: 1.5rem;
+    }
+
+    /* ── GRID ── */
+    .cf-grid {
+      display: grid;
+      gap: 1rem 1.25rem;
+    }
+    .cf-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .cf-grid-4 { grid-template-columns: 2fr 1fr 1fr 1fr; }
+    .cf-grid-2 { grid-template-columns: 2fr 1fr; }
+
+    /* ── FIELD ── */
+    .cf-field { display: flex; flex-direction: column; gap: .4rem; }
+
+    .cf-label {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+    }
+    .cf-req { color: #E24B4A; }
+
+    .cf-input, .cf-select {
+      height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0 .9rem;
+      font-size: .875rem;
+      font-family: var(--font-body);
+      color: var(--text-main);
+      background: var(--surface);
+      outline: none;
+      transition: border-color .18s, box-shadow .18s, background .18s;
+      width: 100%;
+    }
+    .cf-input:focus, .cf-select:focus {
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 3.5px rgba(0,200,150,.12);
+    }
+    .cf-input[readonly] {
+      background: #ECEEF5;
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+    .cf-input::placeholder { color: #BCC5D6; }
+    .cf-select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B7A93'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right .85rem center;
+      background-size: 10px;
+      padding-right: 2.2rem;
+      background-color: var(--surface);
+    }
+    .cf-select:focus { background-color: #fff; }
+
+    /* ── RADIO SEXE ── */
+    .cf-radio-group {
+      display: flex;
+      gap: .6rem;
+      height: 44px;
+      align-items: center;
+    }
+    .cf-radio-opt {
+      flex: 1;
+      position: relative;
+    }
+    .cf-radio-opt input {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+    .cf-radio-opt label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all .18s;
+    }
+    .cf-radio-opt label svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; }
+    .cf-radio-opt input:checked + label {
+      border-color: var(--accent);
+      background: var(--accent-bg);
+      color: var(--accent-dim);
+      font-weight: 600;
+    }
+
+    /* ── PHOTO UPLOAD ── */
+    .cf-photo-zone {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .cf-photo-upload {
+      flex: 1;
+    }
+
+    .cf-upload-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .6rem;
+      padding: 1.5rem;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: all .18s;
+      text-align: center;
+    }
+    .cf-upload-label:hover {
+      border-color: var(--accent);
+      background: var(--accent-bg);
+    }
+    .cf-upload-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: #EEF0F8;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .18s;
+    }
+    .cf-upload-label:hover .cf-upload-icon { background: rgba(0,200,150,.2); }
+    .cf-upload-icon svg { width: 20px; height: 20px; stroke: var(--text-muted); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .cf-upload-label:hover .cf-upload-icon svg { stroke: var(--accent-dim); }
+    .cf-upload-text { font-size: .83rem; font-weight: 500; color: var(--text-main); }
+    .cf-upload-hint { font-size: .74rem; color: var(--text-muted); }
+    .cf-upload-input { display: none; }
+
+    /* Preview */
+    .cf-photo-preview {
+      width: 120px;
+      flex-shrink: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: .6rem;
+    }
+    .cf-photo-preview.visible { display: flex; }
+    .cf-preview-frame {
+      width: 110px;
+      height: 140px;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cf-preview-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .cf-preview-label {
+      font-size: .72rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .cf-preview-badge {
+      font-size: .68rem;
+      font-weight: 600;
+      padding: .2rem .6rem;
+      border-radius: 20px;
+      background: var(--accent-bg);
+      color: var(--accent-dim);
+    }
+
+    /* ── ACTIONS ── */
+    .cf-actions {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      box-shadow: 0 2px 16px rgba(13,27,42,.05);
+    }
+
+    .cf-btn-submit {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .7rem 1.75rem;
+      background: var(--accent);
+      color: var(--navy);
+      font-family: var(--font-body);
+      font-size: .875rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .18s, transform .1s;
+    }
+    .cf-btn-submit:hover { background: var(--accent-dim); }
+    .cf-btn-submit:active { transform: scale(.98); }
+    .cf-btn-submit svg { width: 16px; height: 16px; stroke: var(--navy); fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+    .cf-btn-cancel {
+      display: inline-flex;
+      align-items: center;
+      padding: .7rem 1.25rem;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-size: .875rem;
+      font-weight: 400;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all .18s;
+    }
+    .cf-btn-cancel:hover { color: var(--text-main); border-color: #c0c7d8; background: var(--surface); }
+
+    .cf-actions-note {
+      margin-left: auto;
+      font-size: .75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .cf-actions-note svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .cf-page { padding: 1.25rem 1rem 3rem; }
+      .cf-grid-3, .cf-grid-4, .cf-grid-2 { grid-template-columns: 1fr; }
+      .cf-progress { gap: .25rem; }
+      .cf-prog-sep { width: 16px; }
+      .cf-photo-zone { flex-direction: column; }
+      .cf-photo-preview { width: 100%; }
+      .cf-preview-frame { width: 100%; height: 180px; }
+      .cf-actions { flex-wrap: wrap; }
+      .cf-actions-note { margin-left: 0; }
+    }
+    @media (max-width: 500px) {
+      .cf-prog-item:nth-child(n+4) { display: none; }
+    }
+  </style>
+</head>
 <body>
 <div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='citizens',pageTitle='Enregistrement Citoyen')}">
 <div th:fragment="content">
-<div class="d-flex align-items-center gap-3 mb-4">
-    <a th:href="@{/citizens}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Retour</a>
-    <h5 class="mb-0" th:text="${citizen.id!=null}?'Modifier Citoyen':'Nouveau Citoyen'"></h5>
-</div>
-<form th:action="${citizen.id!=null}?@{/citizens/{id}/edit(id=${citizen.id})}:@{/citizens/new}" method="post" enctype="multipart/form-data">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-    <div class="card mb-4"><div class="card-header"><i class="bi bi-person-fill me-2 text-primary"></i>Informations Personnelles</div>
-    <div class="card-body"><div class="row g-3">
-        <div class="col-md-4"><label class="form-label fw-semibold">N° National <span class="text-danger">*</span></label><input type="text" name="numeroNational" class="form-control" th:value="${citizen.numeroNational}" th:readonly="${citizen.id!=null}" placeholder="Ex: MG-2000-001234" required></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label><input type="text" name="nom" class="form-control" th:value="${citizen.nom}" required></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Prénom <span class="text-danger">*</span></label><input type="text" name="prenom" class="form-control" th:value="${citizen.prenom}" required></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Date de Naissance <span class="text-danger">*</span></label><input type="date" name="dateNaissance" class="form-control" th:value="${citizen.dateNaissance}" required></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Lieu de Naissance <span class="text-danger">*</span></label><input type="text" name="lieuNaissance" class="form-control" th:value="${citizen.lieuNaissance}" required></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Sexe <span class="text-danger">*</span></label>
-            <select name="sexe" class="form-select" required><option value="">-- Sélectionner --</option><option value="M" th:selected="${citizen.sexe=='M'}">Masculin</option><option value="F" th:selected="${citizen.sexe=='F'}">Féminin</option></select>
-        </div>
-    </div></div></div>
-    <div class="card mb-4"><div class="card-header"><i class="bi bi-geo-alt-fill me-2 text-primary"></i>Adresse</div>
-    <div class="card-body"><div class="row g-3">
-        <div class="col-md-6"><label class="form-label fw-semibold">Adresse <span class="text-danger">*</span></label><input type="text" name="adresse" class="form-control" th:value="${citizen.adresse}" required></div>
-        <div class="col-md-3"><label class="form-label fw-semibold">Région</label>
-            <select name="region" class="form-select">
-                <option value="">-- Sélectionner --</option>
-                <option th:each="r:${ {'Analamanga','Vakinankaratra','Itasy','Bongolava','Haute Matsiatra','Atsinanana','Analanjirofo','Alaotra-Mangoro','Boeny','Sofia','Betsiboka','Melaky','Atsimo-Andrefana','Androy','Anosy','Menabe','Diana','Sava'} }" th:value="${r}" th:text="${r}" th:selected="${citizen.region==r}"></option>
-            </select>
-        </div>
-        <div class="col-md-3"><label class="form-label fw-semibold">Profession</label><input type="text" name="profession" class="form-control" th:value="${citizen.profession}"></div>
-    </div></div></div>
-    <div class="card mb-4"><div class="card-header"><i class="bi bi-camera-fill me-2 text-primary"></i>Photo</div>
-    <div class="card-body">
-        <input type="file" name="photo" class="form-control" accept="image/*" id="photoInput">
-        <small class="text-muted">JPG, PNG — max 5MB</small>
-        <div id="photoPreview" class="mt-3" style="display:none"><img id="previewImg" style="max-width:150px;max-height:180px;border:2px solid #dee2e6;border-radius:8px" alt="Aperçu"></div>
-    </div></div>
-    <div class="d-flex gap-3">
-        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-circle me-2"></i><span th:text="${citizen.id!=null}?'Mettre à jour':'Enregistrer'"></span></button>
-        <a th:href="@{/citizens}" class="btn btn-outline-secondary">Annuler</a>
+
+  <div class="cf-page">
+
+    <!-- TOPBAR -->
+    <div class="cf-topbar">
+      <a th:href="@{/citizens}" class="cf-back">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Retour
+      </a>
+      <div>
+        <h1 class="cf-page-title" th:text="${citizen.id!=null} ? 'Modifier le citoyen' : 'Nouveau citoyen'">Nouveau citoyen</h1>
+        <p class="cf-page-sub">Renseignez les informations du titulaire de la carte.</p>
+      </div>
     </div>
-</form>
+
+    <!-- PROGRESS STEPS -->
+    <div class="cf-progress">
+      <div class="cf-prog-item">
+        <div class="cf-prog-num">01</div>
+        <span class="cf-prog-label">Identité</span>
+      </div>
+      <div class="cf-prog-sep"></div>
+      <div class="cf-prog-item">
+        <div class="cf-prog-num">02</div>
+        <span class="cf-prog-label">Adresse</span>
+      </div>
+      <div class="cf-prog-sep"></div>
+      <div class="cf-prog-item">
+        <div class="cf-prog-num">03</div>
+        <span class="cf-prog-label">Photo</span>
+      </div>
+      <div class="cf-prog-sep"></div>
+      <div class="cf-prog-item">
+        <div class="cf-prog-num" style="background:rgba(13,27,42,.15);color:var(--text-muted)">04</div>
+        <span class="cf-prog-label">Confirmation</span>
+      </div>
+    </div>
+
+    <form th:action="${citizen.id!=null}?@{/citizens/{id}/edit(id=${citizen.id})}:@{/citizens/new}"
+          method="post" enctype="multipart/form-data">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+      <!-- ══ SECTION 1 : Informations Personnelles ══ -->
+      <div class="cf-section">
+        <div class="cf-section-head">
+          <div class="cf-section-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <span class="cf-section-title">Informations Personnelles</span>
+          <span class="cf-section-sub">Étape 01 / 03</span>
+        </div>
+        <div class="cf-section-body">
+          <!-- Row 1 : N° National, Nom, Prénom -->
+          <div class="cf-grid cf-grid-3" style="margin-bottom:1rem">
+            <div class="cf-field">
+              <label class="cf-label">N° National <span class="cf-req">*</span></label>
+              <input type="text" name="numeroNational" class="cf-input"
+                th:value="${citizen.numeroNational}"
+                th:readonly="${citizen.id!=null}"
+                placeholder="MG-2000-001234" required>
+            </div>
+            <div class="cf-field">
+              <label class="cf-label">Nom <span class="cf-req">*</span></label>
+              <input type="text" name="nom" class="cf-input" th:value="${citizen.nom}" placeholder="RAKOTO" required>
+            </div>
+            <div class="cf-field">
+              <label class="cf-label">Prénom <span class="cf-req">*</span></label>
+              <input type="text" name="prenom" class="cf-input" th:value="${citizen.prenom}" placeholder="Jean" required>
+            </div>
+          </div>
+          <!-- Row 2 : Date naissance, Lieu, Sexe -->
+          <div class="cf-grid cf-grid-3">
+            <div class="cf-field">
+              <label class="cf-label">Date de Naissance <span class="cf-req">*</span></label>
+              <input type="date" name="dateNaissance" class="cf-input" th:value="${citizen.dateNaissance}" required>
+            </div>
+            <div class="cf-field">
+              <label class="cf-label">Lieu de Naissance <span class="cf-req">*</span></label>
+              <input type="text" name="lieuNaissance" class="cf-input" th:value="${citizen.lieuNaissance}" placeholder="Antananarivo" required>
+            </div>
+            <div class="cf-field">
+              <label class="cf-label">Sexe <span class="cf-req">*</span></label>
+              <div class="cf-radio-group">
+                <div class="cf-radio-opt">
+                  <input type="radio" name="sexe" id="sexeM" value="M" th:checked="${citizen.sexe=='M'}">
+                  <label for="sexeM">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+                    Masculin
+                  </label>
+                </div>
+                <div class="cf-radio-opt">
+                  <input type="radio" name="sexe" id="sexeF" value="F" th:checked="${citizen.sexe=='F'}">
+                  <label for="sexeF">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="7"/><line x1="12" y1="17" x2="12" y2="22"/><line x1="9" y1="20" x2="15" y2="20"/></svg>
+                    Féminin
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SECTION 2 : Adresse ══ -->
+      <div class="cf-section">
+        <div class="cf-section-head">
+          <div class="cf-section-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <span class="cf-section-title">Adresse &amp; Localisation</span>
+          <span class="cf-section-sub">Étape 02 / 03</span>
+        </div>
+        <div class="cf-section-body">
+          <div class="cf-grid" style="grid-template-columns: 2fr 1fr 1fr; gap: 1rem 1.25rem;">
+            <div class="cf-field">
+              <label class="cf-label">Adresse <span class="cf-req">*</span></label>
+              <input type="text" name="adresse" class="cf-input" th:value="${citizen.adresse}" placeholder="Lot II J 67, Antananarivo" required>
+            </div>
+            <div class="cf-field">
+              <label class="cf-label">Région</label>
+              <select name="region" class="cf-select">
+                <option value="">— Sélectionner —</option>
+                <option th:each="r : ${ {'Analamanga','Vakinankaratra','Itasy','Bongolava','Haute Matsiatra','Atsinanana','Analanjirofo','Alaotra-Mangoro','Boeny','Sofia','Betsiboka','Melaky','Atsimo-Andrefana','Androy','Anosy','Menabe','Diana','Sava'} }"
+                        th:value="${r}" th:text="${r}" th:selected="${citizen.region==r}">
+                </option>
+              </select>
+            </div>
+            <div class="cf-field">
+              <label class="cf-label">Profession</label>
+              <input type="text" name="profession" class="cf-input" th:value="${citizen.profession}" placeholder="Ex : Enseignant">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SECTION 3 : Photo ══ -->
+      <div class="cf-section">
+        <div class="cf-section-head">
+          <div class="cf-section-icon">
+            <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <span class="cf-section-title">Photo d'identité</span>
+          <span class="cf-section-sub">Étape 03 / 03</span>
+        </div>
+        <div class="cf-section-body">
+          <div class="cf-photo-zone">
+            <div class="cf-photo-upload">
+              <label class="cf-upload-label" for="photoInput">
+                <div class="cf-upload-icon">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <span class="cf-upload-text">Cliquez ou glissez une photo ici</span>
+                <span class="cf-upload-hint">JPG, PNG — taille maximale 5 MB</span>
+              </label>
+              <input type="file" name="photo" id="photoInput" class="cf-upload-input" accept="image/*">
+            </div>
+            <div class="cf-photo-preview" id="photoPreview">
+              <div class="cf-preview-frame">
+                <img id="previewImg" alt="Aperçu photo">
+              </div>
+              <span class="cf-preview-label">Aperçu</span>
+              <span class="cf-preview-badge">Photo sélectionnée</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ACTIONS ══ -->
+      <div class="cf-actions">
+        <button type="submit" class="cf-btn-submit">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <span th:text="${citizen.id!=null} ? 'Mettre à jour' : 'Enregistrer le citoyen'">Enregistrer le citoyen</span>
+        </button>
+        <a th:href="@{/citizens}" class="cf-btn-cancel">Annuler</a>
+        <span class="cf-actions-note">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Les champs marqués <span style="color:#E24B4A;font-weight:600;margin:0 2px">*</span> sont obligatoires
+        </span>
+      </div>
+
+    </form>
+  </div>
+
 </div>
 <div th:fragment="scripts">
-<script>document.getElementById('photoInput').addEventListener('change',function(e){const f=e.target.files[0];if(f){const r=new FileReader();r.onload=ev=>{document.getElementById('previewImg').src=ev.target.result;document.getElementById('photoPreview').style.display='block'};r.readAsDataURL(f)}});</script>
+<script>
+  document.getElementById('photoInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('previewImg').src = ev.target.result;
+      document.getElementById('photoPreview').classList.add('visible');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* Drag-and-drop support */
+  const uploadLabel = document.querySelector('.cf-upload-label');
+  const input = document.getElementById('photoInput');
+  uploadLabel.addEventListener('dragover', e => { e.preventDefault(); uploadLabel.style.borderColor = 'var(--accent)'; });
+  uploadLabel.addEventListener('dragleave', () => { uploadLabel.style.borderColor = ''; });
+  uploadLabel.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadLabel.style.borderColor = '';
+    const dt = e.dataTransfer;
+    if (dt.files.length) {
+      input.files = dt.files;
+      input.dispatchEvent(new Event('change'));
+    }
+  });
+</script>
 </div>
-</div></body></html>
+</div>
+</body>
+</html>

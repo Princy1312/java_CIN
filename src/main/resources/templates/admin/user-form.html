@@ -1,32 +1,519 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: head}"></head>
+<head th:replace="~{layout :: head}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0D1B2A;
+      --navy-mid: #1B2E42;
+      --accent: #00C896;
+      --accent-dim: #00A07A;
+      --surface: #F7F8FC;
+      --border: #E2E6EF;
+      --text-main: #0D1B2A;
+      --text-muted: #6B7A93;
+      --radius: 18px;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--surface);
+      min-height: 100vh;
+      color: var(--text-main);
+    }
+
+    /* ── PAGE WRAPPER ── */
+    .uf-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      background:
+        radial-gradient(ellipse 60% 40% at 10% 90%, rgba(0,200,150,.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 90% 10%, rgba(13,27,42,.06) 0%, transparent 70%),
+        var(--surface);
+    }
+
+    /* ── CARD ── */
+    .uf-card {
+      width: 100%;
+      max-width: 860px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      box-shadow: 0 24px 60px rgba(13,27,42,.14), 0 2px 8px rgba(13,27,42,.06);
+    }
+
+    /* ── LEFT PANEL ── */
+    .uf-side {
+      background: var(--navy);
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .uf-side::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 80%, rgba(0,200,150,.18) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,.04) 0%, transparent 50%);
+    }
+
+    .uf-geo {
+      position: absolute;
+      right: -40px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 180px;
+      height: 180px;
+      border: 1.5px solid rgba(0,200,150,.2);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .uf-geo::after {
+      content: '';
+      position: absolute;
+      inset: 28px;
+      border: 1px solid rgba(0,200,150,.12);
+      border-radius: 50%;
+    }
+
+    .uf-brand {
+      position: relative;
+      z-index: 1;
+    }
+
+    .uf-dot {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .uf-dot svg { width: 18px; height: 18px; fill: none; stroke: white; stroke-width: 2.2; stroke-linecap: round; }
+
+    .uf-side-title {
+      font-family: var(--font-display);
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.25;
+      margin-bottom: .75rem;
+    }
+
+    .uf-side-sub {
+      font-size: .82rem;
+      color: rgba(255,255,255,.45);
+      line-height: 1.6;
+    }
+
+    .uf-steps {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .uf-step {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .uf-step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.2);
+      flex-shrink: 0;
+      transition: background .3s;
+    }
+    .uf-step-dot.active { background: var(--accent); box-shadow: 0 0 0 3px rgba(0,200,150,.25); }
+
+    .uf-step-label {
+      font-size: .8rem;
+      color: rgba(255,255,255,.35);
+      font-weight: 400;
+    }
+    .uf-step-label.active { color: rgba(255,255,255,.85); font-weight: 500; }
+
+    /* ── MAIN FORM ── */
+    .uf-main {
+      background: #fff;
+      padding: 2.5rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TOPBAR ── */
+    .uf-topbar {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: 2rem;
+    }
+
+    .uf-back {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: .4rem .8rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all .18s;
+    }
+    .uf-back:hover { background: var(--surface); color: var(--text-main); border-color: #cdd2de; }
+    .uf-back svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .uf-heading {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* ── SECTION LABEL ── */
+    .uf-section {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      margin-bottom: 1.5rem;
+    }
+    .uf-section-line {
+      height: 1px;
+      flex: 1;
+      background: var(--border);
+    }
+    .uf-section-badge {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* ── GRID ── */
+    .uf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 1.25rem;
+    }
+    .uf-grid .span-2 { grid-column: span 2; }
+
+    /* ── FIELD ── */
+    .uf-field { display: flex; flex-direction: column; gap: .4rem; }
+
+    .uf-label {
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+    }
+    .uf-label .req { color: #E24B4A; font-size: .85em; }
+
+    .uf-input, .uf-select {
+      height: 42px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0 .9rem;
+      font-size: .875rem;
+      font-family: var(--font-body);
+      color: var(--text-main);
+      background: var(--surface);
+      transition: border-color .18s, box-shadow .18s, background .18s;
+      outline: none;
+      width: 100%;
+    }
+    .uf-input:focus, .uf-select:focus {
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 3.5px rgba(0,200,150,.12);
+    }
+    .uf-input[readonly] {
+      background: #f0f2f7;
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+    .uf-select { cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B7A93'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right .8rem center;
+      padding-right: 2rem;
+    }
+
+    /* ── TOGGLE SWITCH ── */
+    .uf-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .75rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color .18s;
+      user-select: none;
+    }
+    .uf-toggle-row:hover { border-color: var(--accent); }
+
+    .uf-switch {
+      position: relative;
+      width: 36px; height: 20px;
+      flex-shrink: 0;
+    }
+    .uf-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .uf-switch-track {
+      position: absolute;
+      inset: 0;
+      background: #D0D5E3;
+      border-radius: 20px;
+      transition: background .2s;
+    }
+    .uf-switch input:checked ~ .uf-switch-track { background: var(--accent); }
+    .uf-switch-thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 14px; height: 14px;
+      background: white;
+      border-radius: 50%;
+      transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    }
+    .uf-switch input:checked ~ .uf-switch-thumb { transform: translateX(16px); }
+
+    .uf-toggle-text { font-size: .82rem; font-weight: 500; color: var(--text-main); }
+    .uf-toggle-sub { font-size: .73rem; color: var(--text-muted); }
+
+    /* ── ACTIONS ── */
+    .uf-actions {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .uf-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .65rem 1.6rem;
+      background: var(--navy);
+      color: white;
+      font-family: var(--font-body);
+      font-size: .875rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .18s, transform .1s;
+    }
+    .uf-btn-primary:hover { background: var(--navy-mid); }
+    .uf-btn-primary:active { transform: scale(.98); }
+    .uf-btn-primary svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .uf-btn-accent {
+      background: var(--accent);
+      color: var(--navy);
+      font-weight: 600;
+    }
+    .uf-btn-accent:hover { background: var(--accent-dim); }
+    .uf-btn-accent svg { stroke: var(--navy); }
+
+    .uf-btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      padding: .65rem 1.2rem;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-size: .875rem;
+      font-weight: 400;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all .18s;
+    }
+    .uf-btn-ghost:hover { color: var(--text-main); border-color: #c0c7d8; background: var(--surface); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      .uf-card { grid-template-columns: 1fr; }
+      .uf-side { padding: 1.75rem 1.5rem; flex-direction: row; align-items: center; gap: 1.5rem; }
+      .uf-steps { display: none; }
+      .uf-geo { display: none; }
+      .uf-side-title { font-size: 1.1rem; margin-bottom: .3rem; }
+      .uf-dot { margin-bottom: 0; }
+      .uf-brand { display: flex; align-items: center; gap: 1rem; }
+      .uf-main { padding: 1.75rem 1.25rem; }
+      .uf-grid { grid-template-columns: 1fr; }
+      .uf-grid .span-2 { grid-column: span 1; }
+    }
+  </style>
+</head>
 <body>
 <div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='users',pageTitle='Utilisateur')}">
 <div th:fragment="content">
-<div class="row justify-content-center"><div class="col-lg-7">
-<div class="d-flex align-items-center gap-3 mb-4"><a th:href="@{/admin/users}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Retour</a><h5 class="mb-0" th:text="${user.id!=null}?'Modifier':'Créer Utilisateur'"></h5></div>
-<div class="card"><div class="card-header"><i class="bi bi-person-gear me-2 text-primary"></i>Informations</div>
-<div class="card-body">
-<form th:action="${user.id!=null}?@{/admin/users/{id}/edit(id=${user.id})}:@{/admin/users/new}" method="post">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-    <div class="row g-3">
-        <div class="col-md-6"><label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label><input type="text" name="nom" class="form-control" th:value="${user.nom}" required></div>
-        <div class="col-md-6"><label class="form-label fw-semibold">Prénom <span class="text-danger">*</span></label><input type="text" name="prenom" class="form-control" th:value="${user.prenom}" required></div>
-        <div class="col-md-8"><label class="form-label fw-semibold">Email <span class="text-danger">*</span></label><input type="email" name="email" class="form-control" th:value="${user.email}" th:readonly="${user.id!=null}" required></div>
-        <div class="col-md-4"><label class="form-label fw-semibold">Rôle <span class="text-danger">*</span></label>
-            <select name="role" class="form-select" required><option th:each="r:${roles}" th:value="${r}" th:text="${r.name().replace('_',' ')}" th:selected="${user.role==r}"></option></select>
+
+  <div class="uf-page">
+    <div class="uf-card">
+
+      <!-- LEFT PANEL -->
+      <aside class="uf-side">
+        <div class="uf-geo"></div>
+
+        <div class="uf-brand">
+          <div class="uf-dot">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div class="uf-side-title" th:text="${user.id!=null} ? 'Modifier\nl\'utilisateur' : 'Nouvel\nutilisateur'">
+              Nouvel utilisateur
+            </div>
+            <p class="uf-side-sub">Gérez les accès et<br>permissions du compte.</p>
+          </div>
         </div>
-        <div class="col-md-6"><label class="form-label fw-semibold">Mot de Passe <span th:text="${user.id!=null}?'':'*'"></span></label><input type="password" name="motDePasse" class="form-control" placeholder="Min 8 caractères" th:required="${user.id==null}"></div>
-        <div class="col-md-3 d-flex align-items-end"><div class="form-check mb-2"><input type="checkbox" name="actif" id="actif" class="form-check-input" th:checked="${user.id==null or user.actif}" value="true"><label for="actif" class="form-check-label">Compte actif</label></div></div>
+
+        <div class="uf-steps">
+          <div class="uf-step">
+            <div class="uf-step-dot active"></div>
+            <span class="uf-step-label active">Identité</span>
+          </div>
+          <div class="uf-step">
+            <div class="uf-step-dot active"></div>
+            <span class="uf-step-label active">Accès &amp; Rôle</span>
+          </div>
+          <div class="uf-step">
+            <div class="uf-step-dot"></div>
+            <span class="uf-step-label">Confirmation</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN FORM -->
+      <main class="uf-main">
+        <!-- Topbar -->
+        <div class="uf-topbar">
+          <a th:href="@{/admin/users}" class="uf-back">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Retour
+          </a>
+          <h1 class="uf-heading" th:text="${user.id!=null} ? 'Modifier le profil' : 'Créer un compte'">
+            Créer un compte
+          </h1>
+        </div>
+
+        <form th:action="${user.id!=null}?@{/admin/users/{id}/edit(id=${user.id})}:@{/admin/users/new}" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+          <!-- Section : Identité -->
+          <div class="uf-section">
+            <span class="uf-section-badge">Identité</span>
+            <div class="uf-section-line"></div>
+          </div>
+
+          <div class="uf-grid">
+            <div class="uf-field">
+              <label class="uf-label">Nom <span class="req">*</span></label>
+              <input type="text" name="nom" class="uf-input" th:value="${user.nom}" placeholder="Dupont" required>
+            </div>
+            <div class="uf-field">
+              <label class="uf-label">Prénom <span class="req">*</span></label>
+              <input type="text" name="prenom" class="uf-input" th:value="${user.prenom}" placeholder="Jean" required>
+            </div>
+            <div class="uf-field span-2">
+              <label class="uf-label">Email <span class="req">*</span></label>
+              <input type="email" name="email" class="uf-input"
+                th:value="${user.email}"
+                th:readonly="${user.id!=null}"
+                placeholder="jean.dupont@example.com" required>
+            </div>
+          </div>
+
+          <!-- Section : Sécurité & Accès -->
+          <div class="uf-section" style="margin-top:1.75rem;">
+            <span class="uf-section-badge">Sécurité &amp; Accès</span>
+            <div class="uf-section-line"></div>
+          </div>
+
+          <div class="uf-grid">
+            <div class="uf-field">
+              <label class="uf-label">Rôle <span class="req">*</span></label>
+              <select name="role" class="uf-select" required>
+                <option th:each="r:${roles}"
+                        th:value="${r}"
+                        th:text="${r.name().replace('_',' ')}"
+                        th:selected="${user.role==r}">
+                </option>
+              </select>
+            </div>
+            <div class="uf-field">
+              <label class="uf-label">
+                Mot de passe
+                <span class="req" th:text="${user.id!=null}?'':'*'"></span>
+              </label>
+              <input type="password" name="motDePasse" class="uf-input"
+                placeholder="Min. 8 caractères"
+                th:required="${user.id==null}">
+            </div>
+
+            <div class="uf-field span-2">
+              <label class="uf-toggle-row" for="actif">
+                <span class="uf-switch">
+                  <input type="checkbox" name="actif" id="actif" value="true"
+                    th:checked="${user.id==null or user.actif}">
+                  <span class="uf-switch-track"></span>
+                  <span class="uf-switch-thumb"></span>
+                </span>
+                <span>
+                  <span class="uf-toggle-text">Compte actif</span><br>
+                  <span class="uf-toggle-sub">L'utilisateur peut se connecter à la plateforme.</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="uf-actions">
+            <button type="submit" class="uf-btn-primary uf-btn-accent">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              <span th:text="${user.id!=null}?'Mettre à jour':'Créer le compte'">Créer le compte</span>
+            </button>
+            <a th:href="@{/admin/users}" class="uf-btn-ghost">Annuler</a>
+          </div>
+
+        </form>
+      </main>
+
     </div>
-    <div class="d-flex gap-3 mt-4">
-        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-circle me-2"></i><span th:text="${user.id!=null}?'Mettre à jour':'Créer'"></span></button>
-        <a th:href="@{/admin/users}" class="btn btn-outline-secondary">Annuler</a>
-    </div>
-</form>
-</div></div>
-</div></div>
+  </div>
+
 </div>
 <div th:fragment="scripts"></div>
-</div></body></html>
+</div>
+</body>
+</html>
