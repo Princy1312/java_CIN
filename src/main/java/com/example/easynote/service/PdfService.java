@@ -35,47 +35,78 @@ public class PdfService {
         document.setMargins(0, 0, 0, 0);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PdfWriter writer = PdfWriter.getInstance(document, out);
+        
         document.open();
 
         PdfContentByte cb = writer.getDirectContent();
+        
+        // Activer l'anti-aliasing pour meilleur rendu
+        // cb.setRenderingMode(PdfContentByte.RENDERING_MODE_DEFAULT);
 
-        // ── COULEURS ──
+        // ── COULEURS AMÉLIORÉES ──
         BaseColor bleuFonce = new BaseColor(26, 60, 94);
         BaseColor bleuClair = new BaseColor(45, 106, 159);
         BaseColor or        = new BaseColor(232, 160, 32);
         BaseColor blanc     = BaseColor.WHITE;
 
-        // ── FOND ──
+        // ── FOND DÉGRADÉ ──
         cb.setColorFill(bleuFonce);
         cb.rectangle(0, 0, cardW, cardH);
         cb.fill();
 
-        // ── BANDE DORÉE HAUT ──
-        cb.setColorFill(or);
-        cb.rectangle(0, cardH - 20, cardW, 20);
-        cb.fill();
-
-        // ── BANDE DORÉE BAS ──
-        cb.setColorFill(or);
-        cb.rectangle(0, 0, cardW, 7);
-        cb.fill();
-
-        // ── COLONNE GAUCHE ──
+        // Ajouter un subtil dégradé
         cb.setColorFill(bleuClair);
-        cb.rectangle(0, 7, 62, cardH - 27);
+        cb.rectangle(2, 2, cardW - 4, cardH - 4);
         cb.fill();
 
-        // ── TITRE ──
-        Font titreFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 5.5f, blanc);
-        ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
-            new Phrase("REPOBLIKAN'I MADAGASIKARA  —  CARTE NATIONALE D'IDENTITÉ", titreFont),
-            cardW / 2, cardH - 13, 0);
+        // ── BANDE DORÉE HAUT AMÉLIORÉE ──
+        cb.setColorFill(or);
+        cb.rectangle(0, cardH - 22, cardW, 22);
+        cb.fill();
+        
+        // Ligne subtile sur la bande dorée
+        cb.setColorFill(new BaseColor(255, 200, 50));
+        cb.rectangle(0, cardH - 22, cardW, 1);
+        cb.fill();
 
-        // ── NUMÉRO NATIONAL VERTICAL ──
-        Font numFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 5.5f, or);
+        // ── BANDE DORÉE BAS AMÉLIORÉE ──
+        cb.setColorFill(or);
+        cb.rectangle(0, 0, cardW, 9);
+        cb.fill();
+        
+        // Ligne subtile sur la bande dorée bas
+        cb.setColorFill(new BaseColor(255, 200, 50));
+        cb.rectangle(0, 8, cardW, 1);
+        cb.fill();
+
+        // ── COLONNE GAUCHE AMÉLIORÉE ──
+        cb.setColorFill(bleuClair);
+        cb.rectangle(0, 9, 65, cardH - 31);
+        cb.fill();
+        
+        // Bordure subtile
+        cb.setColorStroke(new BaseColor(200, 200, 200));
+        cb.setLineWidth(0.5f);
+        cb.rectangle(0.5f, 0.5f, cardW - 1, cardH - 1);
+        cb.stroke();
+
+        // ── TITRE AMÉLIORÉ ──
+        Font titreFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 6f, blanc);
+        titreFont.setColor(blanc);
+        ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
+            new Phrase("REPOBLIKAN'I MADAGASIKARA", titreFont),
+            cardW / 2, cardH - 15, 0);
+        
+        Font sousTitreFont = FontFactory.getFont(FontFactory.HELVETICA, 4f, blanc);
+        ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
+            new Phrase("CARTE NATIONALE D'IDENTITÉ", sousTitreFont),
+            cardW / 2, cardH - 8, 0);
+
+        // ── NUMÉRO NATIONAL VERTICAL AMÉLIORÉ ──
+        Font numFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 6f, or);
         ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
             new Phrase(c.getNumeroNational(), numFont),
-            12, cardH / 2, 90);
+            15, cardH / 2, 90);
 
         // ══════════════════════════════════════
         // ── PHOTO — utiliser cb.addImage() pas document.add() ──

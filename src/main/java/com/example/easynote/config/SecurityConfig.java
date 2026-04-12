@@ -46,10 +46,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/h2-console/**",
-                                 "/api/auth/**", "/api/verify/**", "/error", "/favicon.ico").permitAll()
+                                 "/api/auth/**", "/api/verify/**", "/qr/**", "/uploads/**", "/error", "/favicon.ico").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
                 .anyRequest().authenticated()
             )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")

@@ -35,7 +35,6 @@ public class CinRequestService {
         CinRequest r = repo.findById(id).orElseThrow(() -> new RuntimeException("Demande introuvable"));
         System.out.println("Demande trouvée - Statut actuel: " + r.getStatut());
         
-        RequestStatus ancienStatut = r.getStatut();
         r.setStatut(status);
         r.setDateTraitement(LocalDateTime.now());
         
