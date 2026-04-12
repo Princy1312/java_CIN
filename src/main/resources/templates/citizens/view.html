@@ -4,7 +4,12 @@
 <head th:replace="~{layout :: head}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
+  
+</head>
+<body>
+<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='citizens',pageTitle='Fiche Citoyen')}">
+<div th:fragment="content">
+<style>
     :root {
       --navy:       #0D1B2A;
       --navy-mid:   #1B2E42;
@@ -400,11 +405,6 @@
       .cv-topbar { gap: .4rem; }
     }
   </style>
-</head>
-<body>
-<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='citizens',pageTitle='Fiche Citoyen')}">
-<div th:fragment="content">
-
   <div class="cv-page">
 
     <!-- ── TOPBAR ── -->
@@ -444,20 +444,20 @@
 
             <!-- Photo -->
             <div class="cv-photo-frame">
-              <img th:if="${citizen.photo != null}"
+              <img th:if="${citizen.photoPath != null}"
                    th:src="@{/citizens/{id}/photo(id=${citizen.id})}"
                    alt="Photo identité">
-              <div th:unless="${citizen.photo != null}" class="cv-photo-placeholder">
+              <div th:unless="${citizen.photoPath != null}" class="cv-photo-placeholder">
                 <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 <span>Photo</span>
               </div>
             </div>
 
-            <div class="cv-id-name" th:text="${citizen.nom} + ' ' + ${citizen.prenom}">NOM Prénom</div>
+            <div class="cv-id-name" th:text="${citizen.nom + ' ' + citizen.prenom}">NOM Prénom</div>
             <div class="cv-id-nin" th:text="${citizen.numeroNational}">MG-0000-000000</div>
             <div class="cv-id-gender"
-                 th:classappend="${citizen.sexe=='M'} ? 'masc' : 'fem'"
-                 th:text="${citizen.sexe=='M'} ? 'Masculin' : 'Féminin'">Sexe</div>
+                 th:classappend="${citizen.sexe == 'M' ? 'masc' : 'fem'}"
+                 th:text="${citizen.sexe == 'M' ? 'Masculin' : 'Féminin'}">Sexe</div>
           </div>
           <div class="cv-id-footer">
             <div>
@@ -534,7 +534,7 @@
                   <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                   Nom complet
                 </div>
-                <div class="cv-field-val" th:text="${citizen.nom} + ' ' + ${citizen.prenom}">—</div>
+                <div class="cv-field-val" th:text="${citizen.nom + ' ' + citizen.prenom}">—</div>
               </div>
 
               <div class="cv-field">
@@ -558,7 +558,7 @@
                   <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                   Sexe
                 </div>
-                <div class="cv-field-val" th:text="${citizen.sexe=='M'} ? 'Masculin' : 'Féminin'">—</div>
+                <div class="cv-field-val" th:text="${citizen.sexe == 'M' ? 'Masculin' : 'Féminin'}">—</div>
               </div>
 
             </div>
@@ -591,7 +591,7 @@
                   <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                   Profession
                 </div>
-                <div class="cv-field-val" th:classappend="${citizen.profession == null} ? 'muted'"
+                <div class="cv-field-val" th:classappend="${citizen.profession == null ? 'muted' : ''}"
                      th:text="${citizen.profession} ?: 'Non renseignée'">—</div>
               </div>
 

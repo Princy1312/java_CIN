@@ -2,7 +2,6 @@ package com.example.easynote.controller;
 
 import com.example.easynote.entity.*;
 import com.example.easynote.enums.*;
-import com.example.easynote.repository.UserRepository;
 import com.example.easynote.security.*;
 import com.example.easynote.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +17,11 @@ import java.util.Map;
 public class ApiController {
     @Autowired private CitizenService citizenService;
     @Autowired private CinRequestService requestService;
-    @Autowired private UserService userService;
-    @Autowired private UserRepository userRepo;
     @Autowired private AuthenticationManager authManager;
+    @Autowired private UserService userService;
     @Autowired private CustomUserDetailsService uds;
     @Autowired private JwtUtil jwtUtil;
-
+    
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         try {

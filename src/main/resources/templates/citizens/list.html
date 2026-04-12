@@ -4,7 +4,12 @@
 <head th:replace="~{layout :: head}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
+  
+</head>
+<body>
+<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='citizens',pageTitle='Gestion des Citoyens')}">
+<div th:fragment="content">
+<style>
     :root {
       --navy:       #0D1B2A;
       --navy-mid:   #1B2E42;
@@ -371,11 +376,6 @@
       .cl-search-card { gap: .5rem; }
     }
   </style>
-</head>
-<body>
-<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='citizens',pageTitle='Gestion des Citoyens')}">
-<div th:fragment="content">
-
   <div class="cl-page">
 
     <!-- ── HEADER ── -->
@@ -476,13 +476,13 @@
               <!-- Citoyen -->
               <td>
                 <div class="cl-citizen-cell">
-                  <div class="cl-avatar" th:classappend="${c.sexe=='M'} ? 'masc' : 'fem'">
-                    <svg th:if="${c.sexe=='M'}" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                    <svg th:unless="${c.sexe=='M'}" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  <div class="cl-avatar" th:classappend="${c.sexe == 'M' ? 'masc' : 'fem'}">
+                    <svg th:if="${c.sexe == 'M'}" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                    <svg th:unless="${c.sexe == 'M'}" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
                   </div>
                   <div>
-                    <div class="cl-citizen-name" th:text="${c.nom} + ' ' + ${c.prenom}">Nom Prénom</div>
-                    <div class="cl-citizen-gender" th:text="${c.sexe=='M'} ? 'Masculin' : 'Féminin'">Sexe</div>
+                    <div class="cl-citizen-name" th:text="${c.nom + ' ' + c.prenom}">Nom Prénom</div>
+                    <div class="cl-citizen-gender" th:text="${c.sexe == 'M' ? 'Masculin' : 'Féminin'}">Sexe</div>
                   </div>
                 </div>
               </td>

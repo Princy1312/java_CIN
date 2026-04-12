@@ -4,12 +4,17 @@ import com.example.easynote.entity.*;
 import com.example.easynote.repository.UserRepository;
 import com.example.easynote.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
@@ -77,5 +82,39 @@ public class CitizenController {
     public String delete(@PathVariable Long id, RedirectAttributes ra) {
         citizenService.delete(id); ra.addFlashAttribute("success", "Citoyen supprimé.");
         return "redirect:/citizens";
+    }
+
+    @GetMapping("/{id}/photo")
+    public ResponseEntity<byte[]> getPhoto(@PathVariable Long id) {
+        try {
+            Citizen citizen = citizenService.getById(id)
+                    .orElseThrow(() -> new RuntimeException("Citoyen introuvable"));
+            
+            if (citizen.getPhotoPath() == null || citizen.getPhotoPath().isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // Construire le chemin complet du fichier
+            Path filePath = Paths.get(System.getProperty("user.dir"), "uploads", "photos", citizen.getPhotoPath());
+            
+            if (!Files.exists(filePath)) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            byte[] photoBytes = Files.readAllBytes(filePath);
+            
+            // Détecter le type de contenu
+            String contentType = "image/jpeg";
+            if (citizen.getPhotoPath().toLowerCase().endsWith(".png")) {
+                contentType = "image/png";
+            }
+            
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(photoBytes);
+                    
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

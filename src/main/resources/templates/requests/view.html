@@ -4,7 +4,12 @@
 <head th:replace="~{layout :: head}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
+  
+</head>
+<body>
+<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='requests',pageTitle='Détail Demande')}">
+<div th:fragment="content">
+<style>
     :root {
       --navy:       #0D1B2A;
       --navy-mid:   #1B2E42;
@@ -281,11 +286,7 @@
       .rd-citizen-link { margin-left: 0; }
     }
   </style>
-</head>
-<body>
-<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='requests',pageTitle='Détail Demande')}">
-<div th:fragment="content">
-
+  
   <div class="rd-page">
 
     <!-- ── TOPBAR ── -->
@@ -297,7 +298,7 @@
       <span class="rd-dossier" th:text="${request.numeroDossier}">DOS-0000</span>
       <span class="rd-status" th:classappend="'s-' + ${request.statut.name()}">
         <span class="rd-status-dot"></span>
-        <span th:text="${request.statut.name().replace('_',' ')}">Statut</span>
+        <span th:text="${#strings.replace(request.statut.name(), '_', ' ')}">Statut</span>
       </span>
     </div>
 
@@ -331,7 +332,7 @@
                     <svg th:if="${request.type.name()=='NOUVELLE_CARTE'}" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                     <svg th:if="${request.type.name()=='RENOUVELLEMENT'}" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
                     <svg th:if="${request.type.name()=='DUPLICATA'}" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    <span th:text="${request.type.name().replace('_',' ')}">TYPE</span>
+                    <span th:text="${#strings.replace(request.type.name(), '_', ' ')}">TYPE</span>
                   </span>
                 </div>
               </div>
@@ -398,13 +399,6 @@
           </div>
           <div class="rd-panel-body">
 
-            <div th:if="${request.statut.name()=='EN_ATTENTE' or request.statut.name()=='EN_COURS'}">
-              <p class="rd-panel-desc">Vérifiez les informations du dossier puis approuvez ou rejetez cette demande.</p>
-
-              <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <input type="hidden" name="newStatus" value="VALIDEE"/>
-                <div class="rd-btn success">
                   <button type="submit" onclick="return confirm('Confirmer la validation ?')">
                     <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     Valider la demande
@@ -432,7 +426,7 @@
             <div th:if="${request.statut.name()!='EN_ATTENTE' and request.statut.name()!='EN_COURS'}">
               <div class="rd-panel-alert info">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span>Demande déjà traitée — statut : <strong th:text="${request.statut.name().replace('_',' ')}"></strong></span>
+                <span>Demande déjà traitée — statut : <strong th:text="${#strings.replace(request.statut.name(), '_', ' ')}"></strong></span>
               </div>
             </div>
 
@@ -517,7 +511,7 @@
               <select name="newStatus" class="rd-select" required>
                 <option th:each="s : ${statuses}"
                         th:value="${s}"
-                        th:text="${s.name().replace('_',' ')}"
+                        th:text="${#strings.replace(s.name(), '_', ' ')}"
                         th:selected="${s == request.statut}"></option>
               </select>
               <label class="rd-field-label">Motif (optionnel)</label>

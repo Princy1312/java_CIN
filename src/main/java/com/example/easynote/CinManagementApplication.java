@@ -5,16 +5,24 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import com.example.easynote.config.AppProperties;
+import com.example.easynote.config.JwtProperties;
 
 @SpringBootApplication
+@EnableConfigurationProperties({AppProperties.class, JwtProperties.class})
 public class CinManagementApplication {
-
 	@Value("${server.port:8080}")
 	private int port;
 
-	public static void main(String[] args) {
-		SpringApplication.run(CinManagementApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(CinManagementApplication.class, args);
+    }
+
+
+
+	
+
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void onReady() {

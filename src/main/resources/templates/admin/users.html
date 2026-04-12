@@ -3,7 +3,12 @@
 <head th:replace="~{layout :: head}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
+  
+</head>
+<body>
+<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='users',pageTitle='Gestion des Utilisateurs')}">
+<div th:fragment="content">
+<style>
     :root {
       --navy:       #0D1B2A;
       --navy-mid:   #1B2E42;
@@ -327,11 +332,6 @@
       .ul-table td:nth-child(5) { display: none; }
     }
   </style>
-</head>
-<body>
-<div th:replace="~{layout :: layout(content=~{::content},scripts=~{::scripts},activePage='users',pageTitle='Gestion des Utilisateurs')}">
-<div th:fragment="content">
-
   <div class="ul-page">
 
     <!-- HEADER -->
