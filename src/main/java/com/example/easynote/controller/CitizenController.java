@@ -4,7 +4,7 @@ import com.example.easynote.entity.*;
 import com.example.easynote.repository.UserRepository;
 import com.example.easynote.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.MediaType;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
