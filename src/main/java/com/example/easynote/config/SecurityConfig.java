@@ -40,11 +40,13 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        System.out.println("Configuration de la sécurité en cours...");
+        
         http
             .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/css/**", "/js/**", "/images/**",
-                                 "/api/auth/**", "/api/verify/**").permitAll()
+                .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/h2-console/**",
+                                 "/api/auth/**", "/api/verify/**", "/error", "/favicon.ico").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
                 .anyRequest().authenticated()
             )
@@ -54,6 +56,15 @@ public class SecurityConfig {
                 .defaultSuccessUrl("/dashboard", true)
                 .failureUrl("/login?error=true")
                 .permitAll()
+                .successHandler((request, response, authentication) -> {
+                    System.out.println("Connexion réussie pour: " + authentication.getName());
+                    System.out.println("Rôles: " + authentication.getAuthorities());
+                    response.sendRedirect("/dashboard");
+                })
+                .failureHandler((request, response, exception) -> {
+                    System.out.println("Échec de connexion: " + exception.getMessage());
+                    response.sendRedirect("/login?error=true");
+                })
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
@@ -62,9 +73,9 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .permitAll()
             )
-            .sessionManagement(s -> s.maximumSessions(1).expiredUrl("/login?expired=true"))
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .sessionManagement(s -> s.maximumSessions(1).expiredUrl("/login?expired=true"));
 
+        System.out.println("Configuration de la sécurité terminée");
         return http.build();
     }
 }

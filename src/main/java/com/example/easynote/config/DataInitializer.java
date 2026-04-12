@@ -15,15 +15,23 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (userRepository.existsByEmail("admin@cin.gov")) return;
+        System.out.println("Vérification des utilisateurs existants...");
+        boolean adminExists = userRepository.existsByEmail("admin@cin.gov");
+        System.out.println("Admin existe: " + adminExists);
+        
+        if (adminExists) {
+            System.out.println("Les utilisateurs par défaut existent déjà.");
+            return;
+        }
 
+        System.out.println("Création des utilisateurs par défaut...");
         createUser("Admin", "Système", "admin@cin.gov", "Admin@1234", Role.ADMINISTRATEUR);
         createUser("Dupont", "Jean", "agent@cin.gov", "Agent@1234", Role.AGENT_ENREGISTREMENT);
         createUser("Martin", "Sophie", "validateur@cin.gov", "Valid@1234", Role.AGENT_VALIDATION);
         createUser("Bernard", "Michel", "superviseur@cin.gov", "Super@1234", Role.SUPERVISEUR);
 
         System.out.println("=====================================================");
-        System.out.println("  COMPTES PAR DÉFAUT:");
+        System.out.println("  COMPTES PAR DÉFAUT CRÉÉS:");
         System.out.println("  admin@cin.gov        / Admin@1234");
         System.out.println("  agent@cin.gov        / Agent@1234");
         System.out.println("  validateur@cin.gov   / Valid@1234");

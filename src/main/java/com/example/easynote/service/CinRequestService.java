@@ -30,10 +30,28 @@ public class CinRequestService {
     }
 
     public CinRequest updateStatus(Long id, RequestStatus status, String motif, User agent) {
-        CinRequest r = repo.findById(id).orElseThrow(() -> new RuntimeException("Introuvable"));
-        r.setStatut(status); r.setDateTraitement(LocalDateTime.now());
-        if (motif != null && !motif.isBlank()) r.setMotifRejet(motif);
-        if (agent != null) r.setAgentResponsable(agent);
-        return repo.save(r);
+        System.out.println("Mise à jour du statut de la demande " + id + " vers: " + status);
+        
+        CinRequest r = repo.findById(id).orElseThrow(() -> new RuntimeException("Demande introuvable"));
+        System.out.println("Demande trouvée - Statut actuel: " + r.getStatut());
+        
+        RequestStatus ancienStatut = r.getStatut();
+        r.setStatut(status);
+        r.setDateTraitement(LocalDateTime.now());
+        
+        if (motif != null && !motif.isBlank()) {
+            r.setMotifRejet(motif);
+            System.out.println("Motif de rejet: " + motif);
+        }
+        
+        if (agent != null) {
+            r.setAgentResponsable(agent);
+            System.out.println("Agent responsable: " + agent.getEmail());
+        }
+        
+        CinRequest saved = repo.save(r);
+        System.out.println("Demande mise à jour avec succès - Nouveau statut: " + saved.getStatut());
+        
+        return saved;
     }
 }

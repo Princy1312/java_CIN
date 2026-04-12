@@ -401,15 +401,20 @@
           </div>
           <div class="rd-panel-body">
 
+            <!-- EN ATTENTE / EN COURS -->
+            <div th:if="${request.statut.name()=='EN_ATTENTE' or request.statut.name()=='EN_COURS'}">
+              <p class="rd-panel-desc">Vous pouvez valider cette demande si elle est complète et conforme.</p>
+              <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input type="hidden" name="newStatus" value="VALIDEE"/>
+                <div class="rd-btn success">
                   <button type="submit" onclick="return confirm('Confirmer la validation ?')">
-                    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
                     Valider la demande
                   </button>
                 </div>
               </form>
-
               <div class="rd-form-sep"></div>
-
               <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <input type="hidden" name="newStatus" value="REJETEE"/>

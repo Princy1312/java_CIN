@@ -15,11 +15,21 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        System.out.println("Tentative de connexion pour: " + email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé: " + email));
-        if (!user.isActif()) throw new UsernameNotFoundException("Compte désactivé");
-        return new org.springframework.security.core.userdetails.User(
+                .orElseThrow(() -> {
+                    System.out.println("Utilisateur non trouvé: " + email);
+                    return new UsernameNotFoundException("Utilisateur non trouvé: " + email);
+                });
+        System.out.println("Utilisateur trouvé: " + user.getEmail() + ", rôle: " + user.getRole() + ", actif: " + user.isActif());
+        if (!user.isActif()) {
+            System.out.println("Compte désactivé pour: " + email);
+            throw new UsernameNotFoundException("Compte désactivé");
+        }
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                 user.getEmail(), user.getMotDePasse(),
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())));
+        System.out.println("UserDetails créés avec succès pour: " + email);
+        return userDetails;
     }
 }
