@@ -16,6 +16,16 @@ public class CitizenService {
     @Autowired private QrCodeService qrCodeService;
     @Value("${app.upload.dir}") private String uploadDir;
 
+    // Initialiser les dossiers au démarrage
+    public CitizenService() {
+        try {
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "uploads", "photos");
+            Files.createDirectories(uploadPath);
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la création des dossiers: " + e.getMessage());
+        }
+    }
+
     public List<Citizen> getAll() { return repo.findByArchiveFalse(); }
     public Optional<Citizen> getById(Long id) { return repo.findById(id); }
     public Optional<Citizen> getByNumeroNational(String n) { return repo.findByNumeroNational(n); }

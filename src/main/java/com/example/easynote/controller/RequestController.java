@@ -25,20 +25,32 @@ public class RequestController {
 
     @GetMapping
     public String list(Model m, @RequestParam(required = false) String status) {
-        List<CinRequest> list = (status != null && !status.isBlank())
-                ? requestService.getByStatus(RequestStatus.valueOf(status))
-                : requestService.getAll();
-        m.addAttribute("requests", list);
-        m.addAttribute("statuses", RequestStatus.values());
-        m.addAttribute("filterStatus", status);
-        return "requests/list";
+        try {
+            List<CinRequest> list = (status != null && !status.isBlank())
+                    ? requestService.getByStatus(RequestStatus.valueOf(status))
+                    : requestService.getAll();
+            m.addAttribute("requests", list);
+            m.addAttribute("statuses", RequestStatus.values());
+            m.addAttribute("filterStatus", status);
+            return "requests/list";
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement des demandes: " + e.getMessage());
+            m.addAttribute("error", "Erreur lors du chargement des demandes: " + e.getMessage());
+            return "requests/list";
+        }
     }
 
     @GetMapping("/new")
     public String newForm(Model m) {
-        m.addAttribute("citizens", citizenService.getAll());
-        m.addAttribute("types", RequestType.values());
-        return "requests/form";
+        try {
+            m.addAttribute("citizens", citizenService.getAll());
+            m.addAttribute("types", RequestType.values());
+            return "requests/form";
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement du formulaire de demande: " + e.getMessage());
+            m.addAttribute("error", "Erreur lors du chargement du formulaire de demande: " + e.getMessage());
+            return "requests/form"; // Return statement added
+        }
     }
 
     @PostMapping("/new")

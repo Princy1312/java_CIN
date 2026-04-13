@@ -428,7 +428,6 @@
         </div>
 
         <form th:action="${user.id!=null}?@{/admin/users/{id}/edit(id=${user.id})}:@{/admin/users/new}" method="post">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
           <!-- Section : Identité -->
           <div class="uf-section">

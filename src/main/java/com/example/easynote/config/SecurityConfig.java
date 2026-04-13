@@ -23,7 +23,9 @@ public class SecurityConfig {
     @Autowired private JwtAuthFilter jwtFilter;
 
     @Bean
-    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public DaoAuthenticationProvider authProvider() {
@@ -40,16 +42,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        System.out.println("Configuration de la sécurité en cours...");
-        
         http
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/h2-console/**",
-                                 "/api/auth/**", "/api/verify/**", "/qr/**", "/uploads/**", "/error", "/favicon.ico").permitAll()
+                .requestMatchers(
+                    "/", "/login", "/logout", "/error",
+                    "/css/**", "/js/**", "/images/**", "/favicon.ico",
+                    "/api/auth/**", "/api/verify/**",
+                    "/qr/**", "/uploads/**",
+                    "/h2-console/**"
+                ).permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMINISTRATEUR")
                 .anyRequest().authenticated()
             )
+            .authenticationProvider(authProvider())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form
                 .loginPage("/login")
@@ -57,26 +63,24 @@ public class SecurityConfig {
                 .defaultSuccessUrl("/dashboard", true)
                 .failureUrl("/login?error=true")
                 .permitAll()
-                .successHandler((request, response, authentication) -> {
-                    System.out.println("Connexion réussie pour: " + authentication.getName());
-                    System.out.println("Rôles: " + authentication.getAuthorities());
-                    response.sendRedirect("/dashboard");
-                })
-                .failureHandler((request, response, exception) -> {
-                    System.out.println("Échec de connexion: " + exception.getMessage());
-                    response.sendRedirect("/login?error=true");
-                })
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
+                .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
             )
-            .sessionManagement(s -> s.maximumSessions(1).expiredUrl("/login?expired=true"));
+            .sessionManagement(s -> s
+                .maximumSessions(5)
+                .expiredUrl("/login?expired=true")
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((req, res, e) -> res.sendRedirect("/login"))
+                .accessDeniedHandler((req, res, e) -> res.sendRedirect("/error"))
+            );
 
-        System.out.println("Configuration de la sécurité terminée");
         return http.build();
     }
 }

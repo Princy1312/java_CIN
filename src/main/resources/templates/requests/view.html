@@ -405,7 +405,6 @@
             <div th:if="${request.statut.name()=='EN_ATTENTE' or request.statut.name()=='EN_COURS'}">
               <p class="rd-panel-desc">Vous pouvez valider cette demande si elle est complète et conforme.</p>
               <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <input type="hidden" name="newStatus" value="VALIDEE"/>
                 <div class="rd-btn success">
                   <button type="submit" onclick="return confirm('Confirmer la validation ?')">
@@ -416,7 +415,6 @@
               </form>
               <div class="rd-form-sep"></div>
               <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <input type="hidden" name="newStatus" value="REJETEE"/>
                 <label class="rd-field-label" style="color:#C0392B">Motif du rejet <span style="color:#E24B4A">*</span></label>
                 <textarea name="motif" class="rd-textarea danger-focus" rows="3"
@@ -456,7 +454,6 @@
                 Télécharger la carte CIN (PDF)
               </a>
               <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <input type="hidden" name="newStatus" value="IMPRIMEE"/>
                 <div class="rd-btn success" style="margin-top:.65rem">
                   <button type="submit" onclick="return confirm('La carte a bien été imprimée et remise au citoyen ?')">
@@ -471,7 +468,6 @@
             <div th:if="${request.statut.name()=='EN_ATTENTE'}">
               <p class="rd-panel-desc">La demande est en attente de validation. Vous pouvez la mettre en cours de traitement.</p>
               <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <input type="hidden" name="newStatus" value="EN_COURS"/>
                 <div class="rd-btn warning">
                   <button type="submit">
@@ -513,8 +509,7 @@
           </div>
           <div class="rd-panel-body">
             <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-              <label class="rd-field-label">Nouveau statut</label>
+                            <label class="rd-field-label">Nouveau statut</label>
               <select name="newStatus" class="rd-select" required>
                 <option th:each="s : ${statuses}"
                         th:value="${s}"

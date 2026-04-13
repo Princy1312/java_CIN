@@ -26,11 +26,17 @@ public class CitizenController {
 
     @GetMapping
     public String list(Model m, @RequestParam(required=false) String search) {
-        List<Citizen> list = (search != null && !search.isBlank())
-                ? citizenService.search(search) : citizenService.getAll();
-        m.addAttribute("citizens", list);
-        m.addAttribute("search", search);
-        return "citizens/list";
+        try {
+            List<Citizen> list = (search != null && !search.isBlank())
+                    ? citizenService.search(search) : citizenService.getAll();
+            m.addAttribute("citizens", list);
+            m.addAttribute("search", search);
+            return "citizens/list";
+        } catch (Exception e) {
+            System.err.println("Erreur lors du chargement des citoyens: " + e.getMessage());
+            m.addAttribute("error", "Erreur lors du chargement des citoyens: " + e.getMessage());
+            return "citizens/list";
+        }
     }
 
     @GetMapping("/new")

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur - CIN Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0D1B2A;
+            --accent: #00C896;
+            --surface: #F7F8FC;
+            --text-main: #0D1B2A;
+            --text-muted: #6B7A93;
+            --font-display: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+        body {
+            font-family: var(--font-body);
+            background: var(--surface);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .error-container {
+            text-align: center;
+            max-width: 500px;
+            padding: 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .error-code {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        .error-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .error-message {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #00A07A;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code" th:text="${status ?: '500'}">500</div>
+        <h1 class="error-title" th:text="${status == 404 ? 'Page non trouvée' : (status == 403 ? 'Accès refusé' : 'Erreur inattendue')}">Erreur inattendue</h1>
+        <p class="error-message" th:text="${error ?: 'Une erreur est survenue lors du traitement de votre demande.'}">
+            Une erreur est survenue lors du traitement de votre demande.
+        </p>
+        <div th:if="${status == 200}" style="color: var(--accent); margin-bottom: 1rem;">
+            Opération réussie
+        </div>
+        <a href="/dashboard" class="btn">Retour au tableau de bord</a>
+    </div>
+</body>
+</html>

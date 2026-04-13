@@ -529,7 +529,6 @@
                   <div sec:authorize="hasAnyRole('AGENT_ENREGISTREMENT','ADMINISTRATEUR')"
                        class="cl-action-btn archive" title="Archiver">
                     <form th:action="@{/citizens/{id}/archive(id=${c.id})}" method="post">
-                      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                       <button type="submit" onclick="return confirm('Archiver ce citoyen ?')">
                         <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
                       </button>
@@ -540,7 +539,6 @@
                   <div sec:authorize="hasRole('ADMINISTRATEUR')"
                        class="cl-action-btn delete" title="Supprimer définitivement">
                     <form th:action="@{/citizens/{id}/delete(id=${c.id})}" method="post">
-                      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                       <button type="submit" onclick="return confirm('Supprimer définitivement ce citoyen ?')">
                         <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                       </button>
